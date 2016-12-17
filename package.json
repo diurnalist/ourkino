@@ -1,0 +1,28 @@
+{
+  "name": "ourkino.com",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/diurnalist/ourkino.com.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/diurnalist/ourkino.com/issues"
+  },
+  "homepage": "https://github.com/diurnalist/ourkino.com#readme",
+  "dependencies": {
+    "async": "^2.1.4",
+    "cheerio": "^0.22.0",
+    "date-fns": "^1.21.0",
+    "debug": "^2.4.4",
+    "request": "^2.79.0",
+    "split": "^1.0.0",
+    "through": "^2.3.8"
+  }
+}
