@@ -5,7 +5,6 @@ const log = require('debug')('scraper:yorck');
 const request = require('request');
 const vm = require('vm');
 
-const eventIdCaptureRegex = /data-event-id\s*=['"](\w+)['"]/i;
 const htmlFragmentCaptureRegex = /\.replaceWith\((.*?)\);$/;
 
 function parseHtml(html) {
@@ -44,19 +43,21 @@ function extractText(node) {
 
 function startOfToday() {
   const now = new Date();
-  now.setHours(0);
-  now.setMinutes(0);
-  now.setSeconds(0);
-  now.setMilliseconds(0);
+  now.setUTCFullYear(now.getFullYear());
+  now.setUTCMonth(now.getMonth(), now.getDate());
+  now.setUTCHours(0);
+  now.setUTCMinutes(0);
+  now.setUTCSeconds(0);
+  now.setUTCMilliseconds(0);
   return now;
 }
 
 function extractShowtimes(eventShowtimesHtml) {
   const $ = parseHtml(eventShowtimesHtml);
 
-  let currentListing = null;
+  let currentLocation = null;
   let column = -1;
-  const listings = [];
+  const showtimes = [];
 
   const firstPage = $('.show-times-page').first();
 
@@ -73,33 +74,33 @@ function extractShowtimes(eventShowtimesHtml) {
       // Skip headers
       if ($elem.find('.program-header').length > 0) return;
 
+      // Keep track of which column we're in (`clearfix` indicates row breaks)
       if ($elem.hasClass('clearfix')) column = -1;
       if ($elem.hasClass('show-times-column')) column++;
 
       if ($elem.hasClass('cinema-name')) {
-        currentListing = {
-          theatre: $elem.text(),
-          showtimes: []
-        };
-
-        listings.push(currentListing);
+        currentLocation = $elem.text();
       }
 
       $('.show-ticket-time', $elem).each((j, time) => {
         const $time = $(time);
         const [ hours, minutes ] = $time.contents().first().text().split(':');
-        const lang = $('.show-lang', $time).text();
         const date = new Date(dateColumns[j]);
         date.setUTCHours(hours);
         date.setUTCMinutes(minutes);
-        currentListing.showtimes.push(date.toUTCString());
+        showtimes.push({
+          location: currentLocation,
+          showtime: date.toISOString(),
+          language: $('.show-lang', $time).text()
+        });
       });
     });
 
-  return listings;
+  return showtimes;
 }
 
 function getShowtimesForEventId(eventId, callback) {
+  log(`getting showtimes for ${eventId}`);
   const fakeDomId = '_';
   // This endpoint (https://yorck.de/shows/<id>/cinemas.js)
   // is parameterized by a string id, which just refers to an HTML
@@ -132,35 +133,33 @@ function getShowtimesForEventId(eventId, callback) {
       .map((line) => {
         const [, htmlString] = line.match(htmlFragmentCaptureRegex) || [];
 
-        if (!htmlString) return null;
+        if (htmlString) {
+          const sandbox = {};
+          const script = new vm.Script(`html = ${htmlString}`);
 
-        const sandbox = {};
-        const script = new vm.Script(`html = ${htmlString}`);
+          script.runInNewContext(sandbox);
 
-        script.runInNewContext(sandbox);
-
-        return sandbox.html.replace(/\r?\n/g, '');
+          return sandbox.html.replace(/\r?\n/g, '');
+        }
       });
 
     callback(null, htmlFragment && extractShowtimes(htmlFragment));
   });
 }
 
-module.exports = () => {
-  return new Promise((resolve, reject) => {
-    getFilms()
-      .then((films) => {
-        async.map(films.map(({ id }) => id), getShowtimesForEventId, (err, allShowtimes) => {
-          films.forEach((film, i) => {
-            film.showtimes = allShowtimes[i];
-          });
+module.exports = (callback) => {
+  log('starting');
 
-          if (err) {
-            reject(err)
-          } else {
-            resolve(films);
-          }
+  getFilms()
+    .then((films) => {
+      async.map(films.map(({ id }) => id), getShowtimesForEventId, (err, allShowtimes) => {
+        films.forEach((film, i) => {
+          film.showtimes = allShowtimes[i];
         });
+
+        log(`got ${films.length} results`);
+
+        callback(err, films);
       });
-  });
+    });
 };

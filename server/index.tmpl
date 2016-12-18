@@ -1,0 +1,17 @@
+<html>
+<head>
+  <title>our kino</title>
+</head>
+<body>
+  <ol>
+  {{#each showtimes}}
+    <li>
+      <span>{{ showtime }}</span>
+      <span>{{ location }}</span>
+      {{#film }}
+      <span>{{ title }}</span>
+      {{/film }}
+    </li>
+  {{/each}}
+  </ol>
+</body>
