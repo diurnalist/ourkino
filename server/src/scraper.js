@@ -37,6 +37,10 @@ function findClosestTitle(films, film) {
   return null;
 }
 
+function titleScore(title) {
+  return title.replace(/[^a-z0-9]/g, '').length;
+}
+
 function merge(results) {
   const flattened = results.reduce((acc, films) => acc.concat(films), []);
   // merge by name
@@ -45,6 +49,16 @@ function merge(results) {
 
     if (closest) {
       closest.showtimes = closest.showtimes.concat(film.showtimes);
+      // pick possibly better title
+      if (titleScore(closest.title) < titleScore(film.title)) {
+        closest.title = film.title;
+      }
+      // merge in optional fields
+      [ 'description', 'poster' ].forEach((key) => {
+        if (!closest[key] && film[key]) {
+          closest[key] = film[key];
+        }
+      });
     } else {
       acc.push(film);
     }

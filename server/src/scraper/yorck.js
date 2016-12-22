@@ -1,6 +1,7 @@
 const addDays = require('date-fns/add_days');
 const async = require('async');
 const cheerio = require('cheerio');
+const datetime = require('../lib/datetime');
 const log = require('debug')('scraper:yorck');
 const request = require('request');
 const vm = require('vm');
@@ -41,17 +42,6 @@ function extractText(node) {
   return node.textValue;
 }
 
-function startOfToday() {
-  const now = new Date();
-  now.setUTCFullYear(now.getFullYear());
-  now.setUTCMonth(now.getMonth(), now.getDate());
-  now.setUTCHours(0);
-  now.setUTCMinutes(0);
-  now.setUTCSeconds(0);
-  now.setUTCMilliseconds(0);
-  return now;
-}
-
 function extractShowtimes(eventShowtimesHtml) {
   const $ = parseHtml(eventShowtimesHtml);
 
@@ -61,7 +51,7 @@ function extractShowtimes(eventShowtimesHtml) {
 
   const firstPage = $('.show-times-page').first();
 
-  const now = startOfToday();
+  const now = datetime.todayUTC();
   const dateColumns = firstPage.find('.program-header')
     .map((i) => {
       return addDays(now, i);
@@ -93,9 +83,11 @@ function extractShowtimes(eventShowtimesHtml) {
         $('.show-ticket-time', $elem).each((__, time) => {
           const $time = $(time);
           const [ hours, minutes ] = $time.contents().first().text().split(':');
+
           const date = new Date(dateColumns[column]);
           date.setUTCHours(hours);
           date.setUTCMinutes(minutes);
+
           showtimes.push({
             location: currentLocation,
             showtime: date.toISOString(),

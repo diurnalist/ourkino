@@ -38,7 +38,7 @@ module.exports = (callback) => {
       const films = Object.keys(movies).map((key) => {
         const movie = movies[key];
         return {
-          title: movie.name,
+          title: movie.name.replace(/\((ov|ome?u)\)/i, '').trim(),
           description: '',
           releaseYear: null,
           poster: movie.lazy_image && `https://kinoheld.de${movie.lazy_image}`,

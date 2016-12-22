@@ -1,4 +1,5 @@
 const addDays = require('date-fns/add_days');
+const datetime = require('./lib/datetime');
 const fs = require('fs');
 const handlebars = require('handlebars');
 const path = require('path');
@@ -14,12 +15,7 @@ const template = handlebars.compile(fs.readFileSync(path.resolve(__dirname, '../
 const outputDir = path.resolve(__dirname, '../public');
 
 function daysFromNow(days) {
-  const today = new Date();
-  today.setUTCHours(0);
-  today.setUTCMinutes(0);
-  today.setUTCSeconds(0);
-  today.setUTCMilliseconds(0);
-
+  const today = datetime.todayUTC();
   const start = addDays(today, days);
   const end = addDays(start, 1);
 
@@ -75,6 +71,8 @@ scraper.getShowtimes()
     return new Promise((resolve, reject) => {
       const today = showtimes.filter(daysFromNow(0)).map(toTemplateData);
       const tomorrow = showtimes.filter(daysFromNow(1)).map(toTemplateData);
+
+      console.log(tomorrow);
 
       fs.writeFile(path.join(outputDir, 'index.html'), template({ today, tomorrow }), (err) => {
         if (err) {
