@@ -10,10 +10,19 @@ body, .page {
   background: #343d46;
 }
 
-.page-header {
-  font-size: 48px;
+header {
+  display: flex;
   padding: 150px 50px 50px;
+}
+
+.page-header {
+  flex: 0.25;
+  font-size: 48px;
   color: #d3e3ea;
+}
+
+.page-header.inactive {
+  opacity: 0.5;
 }
 
 .showtime {

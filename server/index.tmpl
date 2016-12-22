@@ -6,10 +6,26 @@
   <link href="https://fonts.googleapis.com/css?family=Crete+Round" rel="stylesheet">
 </head>
 <body>
-  <div class="page">
-    <h3 class="page-header">Today</h3>
+  <header>
+    <h3 class="page-header" data-goto-page="today">Today</h3>
+    <h3 class="page-header inactive" data-goto-page="tomorrow">Tomorrow</h3>
+  </header>
+  <div class="page" data-page="today">
     <ol class="showtimes">
     {{#each today}}
+      <li class="showtime" data-iso-time="{{ isoTime }}">
+        <div class="showtime-time">{{ time }}</div>
+        <div class="showtime-info">
+          <div class="showtime-title">{{ title }}</div>
+          <div class="showtime-location">{{ location }}</div>
+        </div>
+      </li>
+    {{/each}}
+    </ol>
+  </div>
+  <div class="page" data-page="tomorrow">
+    <ol class="showtimes">
+    {{#each tomorrow}}
       <li class="showtime" data-iso-time="{{ isoTime }}">
         <div class="showtime-time">{{ time }}</div>
         <div class="showtime-info">
