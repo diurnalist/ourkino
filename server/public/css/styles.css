@@ -1,0 +1,48 @@
+body {
+  font-family: 'Crete Round', serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body, .page {
+  background: #343d46;
+}
+
+.page-header {
+  font-size: 48px;
+  padding: 150px 50px 50px;
+  color: #d3e3ea;
+}
+
+.showtime {
+  display: flex;
+  flex-flow: row wrap;
+  padding: 50px;
+}
+
+.showtime-time {
+  flex: 1;
+  font-size: 96px;
+  color: #d3e3ea;
+}
+
+.showtime-info {
+  flex: 3;
+  padding: 15px 0 0 50px;
+}
+
+.showtime-title {
+  font-size: 48px;
+  color: #93cce4;
+  line-height: 1.1em;
+}
+
+.showtime-location {
+  font-size: 36px;
+  text-transform: uppercase;
+  margin-top: 25px;
+  color: #2e8ab1;
+  letter-spacing: 8px;
+}

@@ -67,34 +67,45 @@ function extractShowtimes(eventShowtimesHtml) {
       return addDays(now, i);
     }).get();
 
-  firstPage.children()
-    .each((i, elem) => {
-      const $elem = $(elem);
+  // This handles the case of an error page, or when there are no more films
+  // available.
+  if (dateColumns.length < 1) {
+    return showtimes;
+  }
 
-      // Skip headers
-      if ($elem.find('.program-header').length > 0) return;
+  try {
+    firstPage.children()
+      .each((_, elem) => {
+        const $elem = $(elem);
 
-      // Keep track of which column we're in (`clearfix` indicates row breaks)
-      if ($elem.hasClass('clearfix')) column = -1;
-      if ($elem.hasClass('show-times-column')) column++;
+        // Skip headers
+        if ($elem.find('.program-header').length > 0) return;
 
-      if ($elem.hasClass('cinema-name')) {
-        currentLocation = $elem.text();
-      }
+        // Keep track of which column we're in (`clearfix` indicates row breaks)
+        if ($elem.hasClass('clearfix')) column = -1;
+        if ($elem.hasClass('show-times-column')) column++;
 
-      $('.show-ticket-time', $elem).each((j, time) => {
-        const $time = $(time);
-        const [ hours, minutes ] = $time.contents().first().text().split(':');
-        const date = new Date(dateColumns[j]);
-        date.setUTCHours(hours);
-        date.setUTCMinutes(minutes);
-        showtimes.push({
-          location: currentLocation,
-          showtime: date.toISOString(),
-          language: $('.show-lang', $time).text()
+        if ($elem.hasClass('cinema-name')) {
+          currentLocation = $elem.text();
+          return;
+        }
+
+        $('.show-ticket-time', $elem).each((__, time) => {
+          const $time = $(time);
+          const [ hours, minutes ] = $time.contents().first().text().split(':');
+          const date = new Date(dateColumns[column]);
+          date.setUTCHours(hours);
+          date.setUTCMinutes(minutes);
+          showtimes.push({
+            location: currentLocation,
+            showtime: date.toISOString(),
+            language: $('.show-lang', $time).text()
+          });
         });
       });
-    });
+  } catch (err) {
+    log(err);
+  }
 
   return showtimes;
 }

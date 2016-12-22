@@ -1,17 +1,24 @@
 <html>
 <head>
   <title>our kino</title>
+  <link href="./css/reset.css" rel="stylesheet">
+  <link href="./css/styles.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Crete+Round" rel="stylesheet">
 </head>
 <body>
-  <ol>
-  {{#each showtimes}}
-    <li>
-      <span>{{ showtime }}</span>
-      <span>{{ location }}</span>
-      {{#film }}
-      <span>{{ title }}</span>
-      {{/film }}
-    </li>
-  {{/each}}
-  </ol>
+  <div class="page">
+    <h3 class="page-header">Today</h3>
+    <ol class="showtimes">
+    {{#each today}}
+      <li class="showtime" data-iso-time="{{ isoTime }}">
+        <div class="showtime-time">{{ time }}</div>
+        <div class="showtime-info">
+          <div class="showtime-title">{{ title }}</div>
+          <div class="showtime-location">{{ location }}</div>
+        </div>
+      </li>
+    {{/each}}
+    </ol>
+  </div>
+  <script src="./js/page.js"></script>
 </body>
