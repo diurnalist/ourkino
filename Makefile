@@ -1,5 +1,6 @@
 .PHONY: server
 server: node_modules server/dist
+	node index.js
 
 .PHONY: node_modules
 node_modules: node_modules-stamp
