@@ -11,7 +11,7 @@ function toDate(showTime) {
 
   const d = new Date();
   d.setUTCFullYear(years);
-  d.setUTCMonth(months, days);
+  d.setUTCMonth(months - 1, days);
   d.setUTCHours(hours);
   d.setUTCMinutes(minutes);
   d.setUTCSeconds(0);
