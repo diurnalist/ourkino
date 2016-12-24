@@ -1,0 +1,12 @@
+<li class="showtime" data-iso-time="{{ isoTime }}">
+  <div class="showtime-time">{{ time }}</div>
+  <div class="showtime-info">
+    <div class="showtime-title">
+      <a href="#">{{ title }}</a>
+      {{#if language }}
+        <span class="showtime-language">{{ language }}</span>
+      {{/if }}
+    </div>
+    <div class="showtime-location">{{ location }}</div>
+  </div>
+</li>

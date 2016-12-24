@@ -11,7 +11,13 @@ program
   .option('-o, --output-dir', 'Output directory')
   .parse(process.argv);
 
-const template = handlebars.compile(fs.readFileSync(path.resolve(__dirname, '../index.tmpl')).toString());
+function getContentsSync(relativePath) {
+  return fs.readFileSync(path.resolve(__dirname, relativePath)).toString();
+}
+
+const template = handlebars.compile(getContentsSync('../index.tmpl'));
+handlebars.registerPartial('showtime', getContentsSync('../showtime.tmpl'));
+
 const outputDir = path.resolve(__dirname, '../public');
 
 function daysFromNow(days) {
@@ -29,7 +35,7 @@ function pad(number) {
   return (number < 10 ? '0' : '') + number;
 }
 
-function toTemplateData({ showtime, location, language, film: { title } }) {
+function toTemplateData({ showtime, location, language, title }) {
   const showtimeDate = new Date(showtime);
   const hours = pad(showtimeDate.getUTCHours());
   const minutes = pad(showtimeDate.getUTCMinutes());
@@ -44,20 +50,6 @@ function toTemplateData({ showtime, location, language, film: { title } }) {
 }
 
 scraper.getShowtimes()
-  .then((films) => {
-    // go from list of films with showtimes to list of showtimes with films
-    const showtimes = films.reduce((acc, film) => {
-      const showtimesForFilm = film.showtimes;
-      delete film.showtimes; // remove circular reference
-      acc = acc.concat(showtimesForFilm.map((showtime) => {
-        showtime.film = film;
-        return showtime;
-      }));
-      return acc;
-    }, []);
-
-    return showtimes;
-  })
   .then((showtimes) => {
     // sort by date
     return showtimes.sort(({ showtime: a }, { showtime: b }) => {

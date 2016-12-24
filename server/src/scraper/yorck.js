@@ -25,11 +25,7 @@ function getFilms(callback) {
 
         return {
           id: $row.attr('id').replace('movie-', ''),
-          title: $('.movie-details h2', $row).text(),
-          poster: $('.movie-poster img', $row).attr('src'),
-          description: $('p', $row).eq(2).text(),
-          // we will fetch the showtimes separately
-          showtimes: []
+          title: $('.movie-details h2', $row).text()
         };
       }).get();
 
@@ -42,7 +38,7 @@ function extractText(node) {
   return node.textValue;
 }
 
-function extractShowtimes(eventShowtimesHtml) {
+function extractShowtimes(title, eventShowtimesHtml) {
   const $ = parseHtml(eventShowtimesHtml);
 
   let currentLocation = null;
@@ -91,7 +87,8 @@ function extractShowtimes(eventShowtimesHtml) {
           showtimes.push({
             location: currentLocation,
             showtime: date.toISOString(),
-            language: $('.show-lang', $time).text()
+            language: $('.show-lang', $time).text(),
+            title
           });
         });
       });
@@ -102,8 +99,8 @@ function extractShowtimes(eventShowtimesHtml) {
   return showtimes;
 }
 
-function getShowtimesForEventId(eventId, callback) {
-  log(`getting showtimes for ${eventId}`);
+function getShowtimesForFilm({ id, title }, callback) {
+  log(`getting showtimes for ${id}`);
   const fakeDomId = '_';
   // This endpoint (https://yorck.de/shows/<id>/cinemas.js)
   // is parameterized by a string id, which just refers to an HTML
@@ -118,7 +115,7 @@ function getShowtimesForEventId(eventId, callback) {
   request({
     url: `https://yorck.de/shows/${fakeDomId}/cinemas.js`,
     qs: {
-      eventid: eventId,
+      eventid: id,
       filter_today: false,
       filter_subtitle: false,
       fitler_children: false
@@ -146,7 +143,7 @@ function getShowtimesForEventId(eventId, callback) {
         }
       });
 
-    callback(null, htmlFragment && extractShowtimes(htmlFragment));
+    callback(null, htmlFragment && extractShowtimes(title, htmlFragment));
   });
 }
 
@@ -155,14 +152,10 @@ module.exports = (callback) => {
 
   getFilms()
     .then((films) => {
-      async.map(films.map(({ id }) => id), getShowtimesForEventId, (err, allShowtimes) => {
-        films.forEach((film, i) => {
-          film.showtimes = allShowtimes[i];
-        });
-
-        log(`got ${films.length} results`);
-
-        callback(err, films);
+      async.map(films, getShowtimesForFilm, (err, allShowtimes) => {
+        const showtimes = allShowtimes.reduce((acc, list) => acc.concat(list), []);
+        log(`got ${showtimes.length} results`);
+        callback(err, showtimes);
       });
     });
 };

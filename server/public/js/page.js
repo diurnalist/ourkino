@@ -17,6 +17,22 @@
       }
     });
 
+    var gotoPageLinks = doc.querySelectorAll('[data-goto-page]');
+
+    gotoPageLinks.forEach(function (linkEl) {
+      var gotoPage = linkEl.dataset.gotoPage;
+
+      linkEl.addEventListener('click', function (event) {
+        gotoPageLinks.forEach(function (le) {
+          le.parentNode.classList.toggle('inactive', le !== linkEl);
+        });
+
+        doc.querySelectorAll('[data-page]').forEach(function (pageEl) {
+          pageEl.classList.toggle('inactive', pageEl.dataset.page !== gotoPage);
+        });
+      });
+    });
+
   });
 
 })();

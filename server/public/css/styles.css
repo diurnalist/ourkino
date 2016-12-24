@@ -6,13 +6,26 @@ body {
   box-sizing: border-box;
 }
 
-body, .page {
+body   {
   background: #343d46;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+a[data-goto-page] {
+  cursor: pointer;
 }
 
 header {
   display: flex;
   padding: 150px 50px 50px;
+}
+
+.page.inactive {
+  display: none;
 }
 
 .page-header {
