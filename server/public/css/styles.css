@@ -61,6 +61,10 @@ header {
   line-height: 1.1em;
 }
 
+.showtime-language {
+  color: #2e8ab1;
+}
+
 .showtime-location {
   font-size: 36px;
   text-transform: uppercase;
