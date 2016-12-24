@@ -29,7 +29,7 @@ function pad(number) {
   return (number < 10 ? '0' : '') + number;
 }
 
-function toTemplateData({ showtime, location, film: { title } }) {
+function toTemplateData({ showtime, location, language, film: { title } }) {
   const showtimeDate = new Date(showtime);
   const hours = pad(showtimeDate.getUTCHours());
   const minutes = pad(showtimeDate.getUTCMinutes());
@@ -38,6 +38,7 @@ function toTemplateData({ showtime, location, film: { title } }) {
     time: `${hours}:${minutes}`,
     isoTime: showtime,
     location,
+    language,
     title
   };
 }
@@ -71,8 +72,6 @@ scraper.getShowtimes()
     return new Promise((resolve, reject) => {
       const today = showtimes.filter(daysFromNow(0)).map(toTemplateData);
       const tomorrow = showtimes.filter(daysFromNow(1)).map(toTemplateData);
-
-      console.log(tomorrow);
 
       fs.writeFile(path.join(outputDir, 'index.html'), template({ today, tomorrow }), (err) => {
         if (err) {
