@@ -35,16 +35,17 @@ function pad(number) {
   return (number < 10 ? '0' : '') + number;
 }
 
-function toTemplateData({ showtime, location, language, title }) {
+function toTemplateData({ deepLink, language, location, showtime, title }) {
   const showtimeDate = new Date(showtime);
   const hours = pad(showtimeDate.getUTCHours());
   const minutes = pad(showtimeDate.getUTCMinutes());
 
   return {
-    time: `${hours}:${minutes}`,
+    deepLink,
     isoTime: showtime,
-    location,
     language,
+    location,
+    time: `${hours}:${minutes}`,
     title
   };
 }

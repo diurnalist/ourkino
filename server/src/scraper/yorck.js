@@ -4,6 +4,7 @@ const cheerio = require('cheerio');
 const datetime = require('../lib/datetime');
 const log = require('debug')('scraper:yorck');
 const request = require('request');
+const url = require('url');
 const vm = require('vm');
 
 const htmlFragmentCaptureRegex = /\.replaceWith\((.*?)\);$/;
@@ -13,8 +14,10 @@ function parseHtml(html) {
 }
 
 function getFilms(callback) {
+  const host = 'https://yorck.de';
+
   return new Promise((resolve, reject) => {
-    request('https://yorck.de/filme', (err, res) => {
+    request(url.resolve(host, 'filme'), (err, res) => {
       if (err) {
         return reject(err);
       }
@@ -25,7 +28,8 @@ function getFilms(callback) {
 
         return {
           id: $row.attr('id').replace('movie-', ''),
-          title: $('.movie-details h2', $row).text()
+          title: $('.movie-details h2', $row).text(),
+          deepLink: url.resolve(host, $('.movie-details > a', $row).attr('href'))
         };
       }).get();
 
@@ -38,7 +42,7 @@ function extractText(node) {
   return node.textValue;
 }
 
-function extractShowtimes(title, eventShowtimesHtml) {
+function extractShowtimes({ deepLink, title }, eventShowtimesHtml) {
   const $ = parseHtml(eventShowtimesHtml);
 
   let currentLocation = null;
@@ -85,9 +89,10 @@ function extractShowtimes(title, eventShowtimesHtml) {
           date.setUTCMinutes(minutes);
 
           showtimes.push({
+            deepLink,
+            language: $('.show-lang', $time).text(),
             location: currentLocation,
             showtime: date.toISOString(),
-            language: $('.show-lang', $time).text(),
             title
           });
         });
@@ -99,7 +104,7 @@ function extractShowtimes(title, eventShowtimesHtml) {
   return showtimes;
 }
 
-function getShowtimesForFilm({ id, title }, callback) {
+function getShowtimesForFilm({ id, deepLink, title }, callback) {
   log(`getting showtimes for ${id}`);
   const fakeDomId = '_';
   // This endpoint (https://yorck.de/shows/<id>/cinemas.js)
@@ -143,7 +148,7 @@ function getShowtimesForFilm({ id, title }, callback) {
         }
       });
 
-    callback(null, htmlFragment && extractShowtimes(title, htmlFragment));
+    callback(null, htmlFragment && extractShowtimes({ deepLink, title }, htmlFragment));
   });
 }
 

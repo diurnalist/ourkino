@@ -2,7 +2,7 @@
   <div class="showtime-time">{{ time }}</div>
   <div class="showtime-info">
     <div class="showtime-title">
-      <a href="#">{{ title }}</a>
+      {{#if deepLink }}<a href="{{ deepLink }}" target="_blank">{{/if }}{{ title }}{{#if deepLink }}</a>{{/if }}
       {{#if language }}
         <span class="showtime-language">{{ language }}</span>
       {{/if }}
