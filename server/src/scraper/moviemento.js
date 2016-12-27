@@ -1,3 +1,4 @@
+const addHours = require('date-fns/add_hours');
 const log = require('debug')('scraper:moviemento');
 const request = require('request');
 const split = require('split');
@@ -38,7 +39,10 @@ module.exports = (callback) => {
 
         const deepLink = url.resolve(host, show.url);
         const language = show.flags[0];
-        const showtime = new Date(show.start);
+        // TODO: this is brittle. need to account for DST
+        // The times stored on kinoheld are UTC, then they are somehow supposed
+        // to be displayed in the proper timezone
+        const showtime = addHours(new Date(show.start), 1);
         const title = movie.name.replace(/\((ov|ome?u)\)/i, '').trim();
 
         showtimes.push({
