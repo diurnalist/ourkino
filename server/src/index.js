@@ -1,4 +1,5 @@
 const addDays = require('date-fns/add_days');
+const config = require('./config');
 const datetime = require('./lib/datetime');
 const fs = require('fs');
 const handlebars = require('handlebars');
@@ -19,6 +20,11 @@ const template = handlebars.compile(getContentsSync('../index.tmpl'));
 handlebars.registerPartial('showtime', getContentsSync('../showtime.tmpl'));
 
 const outputDir = path.resolve(__dirname, '../public');
+
+function locationMatches({ location }) {
+  const locationSearch = location.toLowerCase();
+  return !!config.locations.find((configLocation) => locationSearch.indexOf(configLocation) >= 0);
+}
 
 function daysFromNow(days) {
   const today = datetime.todayUTC();
@@ -51,6 +57,7 @@ function toTemplateData({ deepLink, language, location, showtime, title }) {
 }
 
 scraper.getShowtimes()
+  .then((showtimes) => showtimes.filter(locationMatches))
   .then((showtimes) => {
     // sort by date
     return showtimes.sort(({ showtime: a }, { showtime: b }) => {
