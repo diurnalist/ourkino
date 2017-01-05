@@ -2,6 +2,7 @@ module.exports = {
   locations: [
     'arsenal',
     'babylon kreuzberg',
+    'babylon mitte',
     'b-ware',
     'brotfabrik',
     'eiszeit',
