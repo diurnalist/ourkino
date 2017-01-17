@@ -10,6 +10,7 @@ module.exports = {
     'intimes',
     'filmtheatre am friedrichshain',
     'hackesche höfe',
+    'kino central',
     'neues off',
     'odeon',
     'passage',
