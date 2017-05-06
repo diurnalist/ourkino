@@ -4,8 +4,11 @@
 
   doc.addEventListener('DOMContentLoaded', function (event) {
 
-    // Hide any events in the past
     var showtimeEls = doc.querySelectorAll('.showtime');
+    var filterEl = doc.querySelector('.filter > input');
+    var gotoPageLinks = doc.querySelectorAll('[data-goto-page]');
+
+    // Hide any events in the past
     showtimeEls.forEach(function (el) {
       var localShowtime = new Date(el.dataset.isoTime);
       localShowtime.setHours(localShowtime.getUTCHours());
@@ -18,17 +21,21 @@
       }
     });
 
-    var filterEl = doc.querySelector('.filter > input');
-    filterEl.addEventListener('input', function (event) {
+    // Allow filtering
+    function onFilterChanged(event) {
       var query = filterEl.value.toLowerCase();
 
       showtimeEls.forEach(function (el) {
         var textSearch = el.dataset.textSearch;
         el.style = textSearch.indexOf(query) >= 0 ? '' : 'display: none;';
       });
-    });
+    }
 
-    var gotoPageLinks = doc.querySelectorAll('[data-goto-page]');
+    filterEl
+      .addEventListener('input', onFilterChanged)
+      .addEventListener('change', onFilterChanged);
+
+    // Allow navigating between pages
     gotoPageLinks.forEach(function (linkEl) {
       var gotoPage = linkEl.dataset.gotoPage;
 
