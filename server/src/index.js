@@ -1,4 +1,5 @@
 const addDays = require('date-fns/add_days');
+const async = require('async');
 const config = require('./config');
 const datetime = require('./lib/datetime');
 const fs = require('fs');
@@ -9,17 +10,46 @@ const scraper = require('./scraper');
 
 program
   .version('0.0.1')
-  .option('-o, --output-dir', 'Output directory')
+  .option('-o, --output-dir [dir]', 'Output directory')
+  .option('-w, --watch', 'Watch templates and recompile on template change')
   .parse(process.argv);
 
-function getContentsSync(relativePath) {
-  return fs.readFileSync(path.resolve(__dirname, relativePath)).toString();
+const outputDir = program.outputDir || path.resolve(__dirname, '../public');
+const watch = program.watch;
+
+const getTemplate = (() => {
+  const indexTemplate = '../index.tmpl';
+  const showtimeTemplate = '../showtime.tmpl';
+
+  function compile() {
+    return getContents(indexTemplate)
+      .then(handlebars.compile)
+      .then((template) => {
+        return getContents(showtimeTemplate)
+          .then((partial) => handlebars.registerPartial('showtime', partial))
+          .then(() => template);
+      });
+  }
+
+  let template = compile();
+
+  if (watch) {
+    require('chokidar')
+      .watch([indexTemplate, showtimeTemplate])
+      .on('change', () => template = compile());
+  }
+
+  return () => template;
+})();
+
+function getContents(relativePath) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path.resolve(__dirname, relativePath), (err, contents) => {
+      if (err) reject(err);
+      else resolve(contents.toString());
+    });
+  });
 }
-
-const template = handlebars.compile(getContentsSync('../index.tmpl'));
-handlebars.registerPartial('showtime', getContentsSync('../showtime.tmpl'));
-
-const outputDir = path.resolve(__dirname, '../public');
 
 function locationMatches({ location }) {
   const locationSearch = location.toLowerCase();
@@ -45,12 +75,17 @@ function toTemplateData({ deepLink, language, location, showtime, title }) {
   const showtimeDate = new Date(showtime);
   const hours = pad(showtimeDate.getUTCHours());
   const minutes = pad(showtimeDate.getUTCMinutes());
+  const textSearch = [ title, location, language ]
+    .filter(Boolean)
+    .map((s) => s.toLowerCase())
+    .join(' | ');
 
   return {
     deepLink,
     isoTime: showtime,
     language,
     location,
+    textSearch,
     time: `${hours}:${minutes}`,
     title
   };
@@ -73,12 +108,15 @@ scraper.getShowtimes()
       const today = showtimes.filter(daysFromNow(0)).map(toTemplateData);
       const tomorrow = showtimes.filter(daysFromNow(1)).map(toTemplateData);
 
-      fs.writeFile(path.join(outputDir, 'index.html'), template({ today, tomorrow }), (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+      getTemplate()
+        .then((template) => {
+          fs.writeFile(path.join(outputDir, 'index.html'), template({ today, tomorrow }), (err) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          });
+        });
     });
   });

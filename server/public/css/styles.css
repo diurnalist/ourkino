@@ -24,6 +24,21 @@ header {
   padding: 150px 50px 50px;
 }
 
+.filter {
+  display: flex;
+  padding: 0 50px;
+}
+
+.filter > input {
+  flex: 1;
+  font-size: 30px;
+  padding: 10px;
+  margin: -10px;
+  background: #272c31;
+  color: #d3e3ea;
+  border: 0;
+}
+
 .page.inactive {
   display: none;
 }

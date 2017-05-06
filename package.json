@@ -27,5 +27,8 @@
     "request": "^2.79.0",
     "split": "^1.0.0",
     "through": "^2.3.8"
+  },
+  "devDependencies": {
+    "chokidar": "^1.6.1"
   }
 }
