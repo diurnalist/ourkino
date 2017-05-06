@@ -17,23 +17,19 @@
       cutoff.setHours(cutoff.getHours() + 1);
 
       if (localShowtime < cutoff) {
-        el.style = 'display: none;';
+        el.style.display = 'none';
       }
     });
 
     // Allow filtering
-    function onFilterChanged(event) {
+    filterEl.addEventListener('input', function (event) {
       var query = filterEl.value.toLowerCase();
 
       showtimeEls.forEach(function (el) {
         var textSearch = el.dataset.textSearch;
-        el.style = textSearch.indexOf(query) >= 0 ? '' : 'display: none;';
+        el.style.display = textSearch.indexOf(query) >= 0 ? '' : 'none';
       });
-    }
-
-    filterEl
-      .addEventListener('input', onFilterChanged)
-      .addEventListener('change', onFilterChanged);
+    });
 
     // Allow navigating between pages
     gotoPageLinks.forEach(function (linkEl) {
