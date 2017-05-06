@@ -31,7 +31,8 @@ header {
 
 .filter > input {
   flex: 1;
-  font-size: 30px;
+  font-size: 48px;
+  font-family: inherit;
   padding: 10px;
   margin: -10px;
   background: #272c31;

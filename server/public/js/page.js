@@ -19,7 +19,7 @@
     });
 
     var filterEl = doc.querySelector('.filter > input');
-    filterEl.addEventListener('keyup', function (event) {
+    filterEl.addEventListener('input', function (event) {
       var query = filterEl.value.toLowerCase();
 
       showtimeEls.forEach(function (el) {
