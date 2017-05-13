@@ -14,6 +14,9 @@ program
   .option('-w, --watch', 'Watch templates and recompile on template change')
   .parse(process.argv);
 
+// Properly report stack traces on errors triggered from Promise chains
+process.on('unhandledRejection', (err) => console.log(err));
+
 const outputDir = program.outputDir || path.resolve(__dirname, '../public');
 const watch = program.watch;
 
