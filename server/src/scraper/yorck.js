@@ -130,6 +130,7 @@ function getShowtimesForFilm({ id, deepLink, title }, callback) {
     }
   }, (err, res) => {
     if (err) {
+      log(`failed to get showtimes for ${id}`);
       return callback(err);
     }
 

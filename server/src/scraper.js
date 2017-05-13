@@ -8,10 +8,14 @@ const scrapers = fs.readdirSync(scraperDir).map((filename) => {
   return require(path.join(scraperDir, filename));
 });
 
+// Avoid making too many calls in parallel - some sites cannot take
+// sudden bursts of traffic, even minor.
+const concurrentTaskLimit = 4;
+
 module.exports = {
   getShowtimes() {
     return new Promise((resolve, reject) => {
-      async.parallel(scrapers, (err, data) => {
+      async.parallelLimit(scrapers, concurrentTaskLimit, (err, data) => {
         if (err) {
           reject(err);
         } else {
