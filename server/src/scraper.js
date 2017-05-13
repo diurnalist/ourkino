@@ -19,7 +19,8 @@ module.exports = {
         if (err) {
           reject(err);
         } else {
-          resolve(data.reduce((acc, list) => acc.concat(list), []));
+          resolve(data.reduce((acc, list) => acc.concat(list), [])
+            .filter(Boolean));
         }
       });
     });
