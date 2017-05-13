@@ -21,6 +21,7 @@ node_modules-stamp:
 # Code transforms
 server/dist: $(shell find server/src -type f -name '*.js')
 	cp -R server/src/ $@
+	touch $@
 
 .PHONY: clean
 clean:
