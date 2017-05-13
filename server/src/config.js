@@ -9,12 +9,15 @@ module.exports = {
     'il kino',
     'intimes',
     'filmtheatre am friedrichshain',
+    'fsk-kino',
     'hackesche höfe',
     'kino central',
     'neues off',
     'odeon',
     'passage',
     'rollberg',
-    'sputnik'
+    'sputnik',
+    'tilsiter lichtspiele',
+    'wolf'
   ]
 };
