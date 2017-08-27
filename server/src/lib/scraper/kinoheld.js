@@ -36,8 +36,13 @@ module.exports = (location, permalink) => (callback) => {
 
       Object.keys(shows).forEach((key) => {
         const show = shows[key];
-        const movie = movies[show.movieId];
-
+        const movie = movies.find(({ id }) => show.movieId === id);
+        
+        if (!movie) {
+          log(`could not find entry for movie with id=${show.movieId}`);
+          return; // Skip
+        }
+        
         const deepLink = url.resolve(host, show.url);
         const language = show.flags[0] || null;
         // TODO: this is brittle. need to account for DST
