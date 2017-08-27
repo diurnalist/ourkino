@@ -14,7 +14,7 @@
       localShowtime.setHours(localShowtime.getUTCHours());
 
       var cutoff = new Date();
-      cutoff.setHours(cutoff.getHours() + 1);
+      cutoff.setHours(cutoff.getHours());
 
       if (localShowtime < cutoff) {
         el.style.display = 'none';
