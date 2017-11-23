@@ -8,7 +8,7 @@ server: node_modules server/dist
 
 SCRAPERS := $(shell find server/src/scraper -type f | sed 's/server\/src\/scraper\///' | sed 's/\.js//')
 
-$(SCRAPERS:%=test-%): test-%:
+$(SCRAPERS:%=test-%): test-%: server/dist
 	@ node test-scraper.js $*
 
 .PHONY: node_modules

@@ -25,11 +25,14 @@ function getFilms(callback) {
       const $ = parseHtml(res.body);
       const films = $('.movie-row').map((i, elem) => {
         const $row = $(elem);
+        const id = $row.attr('id').replace('movie-', '');
+        const title = $('.movie-details h2', $row).text();
+        const deepLinkPath = $('.movie-details > a', $row).attr('href');
 
         return {
-          id: $row.attr('id').replace('movie-', ''),
-          title: $('.movie-details h2', $row).text(),
-          deepLink: url.resolve(host, $('.movie-details > a', $row).attr('href'))
+          id,
+          title,
+          deepLink: deepLinkPath && url.resolve(host, deepLinkPath)
         };
       }).get();
 
