@@ -5,6 +5,7 @@ module.exports = {
     'babylon mitte',
     'b-ware',
     'brotfabrik',
+    'delphi lux',
     'eiszeit',
     'il kino',
     'intimes',
