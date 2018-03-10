@@ -16,7 +16,7 @@ function getViewData(permalink) {
     })
     .pipe(split())
     .on('data', (line) => {
-      const [, json] = line.match(dataExtractRegex) || []
+      const [, json] = line.match(dataExtractRegex) || [];
 
       if (json) {
         resolve(JSON.parse(json));
@@ -36,7 +36,7 @@ module.exports = (location, permalink) => (callback) => {
 
       Object.keys(shows).forEach((key) => {
         const show = shows[key];
-        const movie = movies.find(({ id }) => show.movieId === id);
+        const movie = Object.values(movies).find(({ id }) => show.movieId === id);
 
         if (!movie) {
           log(`could not find entry for movie with id=${show.movieId}`);
