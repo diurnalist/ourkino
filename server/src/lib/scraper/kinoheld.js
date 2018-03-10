@@ -45,10 +45,7 @@ module.exports = (location, permalink) => (callback) => {
 
         const deepLink = show.url && url.resolve(host, show.url);
         const language = show.flags[0] || null;
-        // TODO: this is brittle. need to account for DST
-        // The times stored on kinoheld are UTC, then they are somehow supposed
-        // to be displayed in the proper timezone
-        const showtime = addHours(new Date(show.start), 1);
+        const showtime = new Date(`${show.date}T${show.time}Z`);
         const title = movie.name.replace(/\((ov|ome?u)\)/i, '').trim();
 
         showtimes.push({
