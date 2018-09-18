@@ -24,10 +24,14 @@
     // Allow filtering
     filterEl.addEventListener('input', function (event) {
       var query = filterEl.value.toLowerCase();
+      var isInverse = query.indexOf('-') === 0;
+      if (isInverse) {
+        query = query.slice(1);
+      }
 
       showtimeEls.forEach(function (el) {
         var textSearch = el.dataset.textSearch;
-        el.style.display = textSearch.indexOf(query) >= 0 ? '' : 'none';
+        el.style.display = textSearch.indexOf(query) >= 0 && !isInverse ? '' : 'none';
       });
     });
 
