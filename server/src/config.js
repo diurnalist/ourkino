@@ -24,6 +24,7 @@ module.exports = {
     ],
     chicago: [
       'gene siskel',
+      'icon at roosevelt',
       'logan',
       'music box'
     ]

@@ -39,14 +39,17 @@ module.exports = (location, permalink) => (callback) => {
         const title = $('[itemprop=name]', elem).text().trim();
         const showtimeDeepLink = url.resolve(host, $('[itemprop=url]', elem).attr('href'));
         const deepLink = showtimeDeepLink.replace(deepLinkReplaceRegex, '$1');
-        const showtimesTokens = $('.showtimes', elem).text().trim().split('\n')
+        const showtimesTokens = $('.showtimes', elem).text().split('\n')
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .filter((s) => !isNaN(parseInt(s)))
           .map((s) => s.split(' '));
 
         showtimesTokens.forEach(([time, ampm]) => {
           let showtime = date;
           const [hours, minutes] = time.split(':').map((s) => parseInt(s));
           showtime = addMinutes(addHours(showtime, hours), minutes);
-          if (ampm === 'pm') showtime = addHours(showtime, 12);
+          if (ampm !== 'am') showtime = addHours(showtime, 12);
 
           showtimes.push({
             deepLink,
