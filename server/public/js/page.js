@@ -31,7 +31,8 @@
 
       showtimeEls.forEach(function (el) {
         var textSearch = el.dataset.textSearch;
-        el.style.display = textSearch.indexOf(query) >= 0 && !isInverse ? '' : 'none';
+        var found = textSearch.indexOf(query) >= 0;
+        el.style.display = found ^ isInverse ? '' : 'none';
       });
     });
 
