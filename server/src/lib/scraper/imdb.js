@@ -8,6 +8,7 @@ const request = require('request');
 const url = require('url');
 
 const host = 'https://www.imdb.com';
+const deepLinkReplaceRegex = /showtimes\/(title\/[^\/]+)\/.*$/;
 
 function showtimesUrlForDate(permalink, date) {
   let day = date.getDate() + 1;
@@ -36,7 +37,8 @@ module.exports = (location, permalink) => (callback) => {
 
       $('.article.st [itemtype="http://schema.org/Movie"]').each((_, elem) => {
         const title = $('[itemprop=name]', elem).text().trim();
-        const deepLink = url.resolve(host, $('[itemprop=url]', elem).attr('href'));
+        const showtimeDeepLink = url.resolve(host, $('[itemprop=url]', elem).attr('href'));
+        const deepLink = showtimeDeepLink.replace(deepLinkReplaceRegex, '$1');
         const showtimesTokens = $('.showtimes', elem).text().trim().split('\n')
           .map((s) => s.split(' '));
 
