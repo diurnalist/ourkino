@@ -54,10 +54,10 @@ function getContents(relativePath) {
   });
 }
 
-function locationMatches({ location }) {
+const locationMatches = (city) => ({ location }) => {
   const locationSearch = location.toLowerCase();
-  return !!config.locations.find((configLocation) => locationSearch.indexOf(configLocation) >= 0);
-}
+  return !!config.locations[city].find((configLocation) => locationSearch.indexOf(configLocation) >= 0);
+};
 
 function daysFromNow(days) {
   const today = datetime.todayUTC();
@@ -95,7 +95,7 @@ function toTemplateData({ deepLink, language, location, showtime, title }) {
 }
 
 scraper.getShowtimes()
-  .then((showtimes) => showtimes.filter(locationMatches))
+  .then((showtimes) => showtimes.filter(locationMatches('chicago')))
   .then((showtimes) => {
     // sort by date
     return showtimes.sort(({ showtime: a }, { showtime: b }) => {

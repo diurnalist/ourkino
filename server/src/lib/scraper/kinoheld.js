@@ -1,4 +1,3 @@
-const addHours = require('date-fns/add_hours');
 const request = require('request');
 const split = require('split');
 const url = require('url');
