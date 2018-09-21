@@ -1,4 +1,5 @@
 const addDays = require('date-fns/add_days');
+const addHours = require('date-fns/add_hours');
 const async = require('async');
 const config = require('./config');
 const datetime = require('./lib/datetime');
@@ -61,8 +62,10 @@ const locationMatches = (city) => ({ location }) => {
 
 function daysFromNow(days) {
   const today = datetime.todayUTC();
-  const start = addDays(today, days);
-  const end = addDays(start, 1);
+  // Cut-off is 3am to account for midnight movies
+  const hourOffset = 3;
+  const start = addHours(addDays(today, days), hourOffset);
+  const end = addHours(addDays(start, 1), hourOffset);
 
   return ({ showtime }) => {
     const showtimeDate = new Date(showtime);
