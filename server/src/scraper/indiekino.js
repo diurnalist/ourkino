@@ -37,7 +37,7 @@ module.exports = (callback) => {
           const title = anchor.length ? anchor.text() : $('.titel', item).text();
           const deepLink = anchor.length ? url.resolve(host, anchor.attr('href')) : null;
 
-          const showtime = new Date(dateColumns[i]);
+          const showtime = datetime.parse(dateColumns[i]);
           showtime.setUTCHours(hours);
           showtime.setUTCMinutes(minutes);
 

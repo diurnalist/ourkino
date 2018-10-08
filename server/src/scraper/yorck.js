@@ -87,9 +87,9 @@ function extractShowtimes({ deepLink, title }, eventShowtimesHtml) {
           const $time = $(time);
           const [ hours, minutes ] = $time.contents().first().text().split(':');
 
-          const date = new Date(dateColumns[column]);
-          date.setUTCHours(hours);
-          date.setUTCMinutes(minutes);
+          const date = datetime.parse(dateColumns[column]).utc();
+          date.hour(hours);
+          date.minute(minutes);
 
           showtimes.push({
             deepLink,

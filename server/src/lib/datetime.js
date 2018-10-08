@@ -1,21 +1,28 @@
+const moment = require('moment-timezone');
+
 module.exports = {
+  parse(str) {
+    return moment(str);
+  },
+
+  now() {
+    return moment();
+  },
+
   todayUTC() {
-    const now = new Date();
-    now.setHours(0);
-    now.setMinutes(0);
-    now.setSeconds(0);
-    now.setMilliseconds(0);
-    return this.toUTC(now);
+    return moment().utc().startOf('day');
   },
 
   toUTC(date) {
-    const utcDate = new Date(date);
-    utcDate.setUTCFullYear(date.getFullYear());
-    utcDate.setUTCMonth(date.getMonth(), date.getDate());
-    utcDate.setUTCHours(date.getHours());
-    utcDate.setUTCMinutes(date.getMinutes());
-    utcDate.setUTCSeconds(date.getSeconds());
-    utcDate.setUTCMilliseconds(date.getMilliseconds());
+    const localDate = moment(date);
+    const utcDate = moment(date).utc();
+    utcDate.year(localDate.year());
+    utcDate.month(localDate.month());
+    utcDate.date(localDate.date());
+    utcDate.hour(localDate.hour());
+    utcDate.minute(localDate.minute());
+    utcDate.second(localDate.second());
+    utcDate.millisecond(localDate.millisecond());
     return utcDate;
   }
 };

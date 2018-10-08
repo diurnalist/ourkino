@@ -1,4 +1,5 @@
 const ical = require('ical');
+const { parse } = require('../datetime');
 
 module.exports = (location, url, { onEvent } = {}) => (callback) => {
   const log = require('debug')(`scraper:${location.toLowerCase().replace(' ', '')}`);
@@ -16,7 +17,7 @@ module.exports = (location, url, { onEvent } = {}) => (callback) => {
         deepLink: null,
         language: null,
         location,
-        showtime: new Date(start),
+        showtime: parse(start),
         title: summary
       }, typeof onEvent === 'function' ? onEvent(event) : {});
     });

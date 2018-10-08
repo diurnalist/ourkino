@@ -1,6 +1,7 @@
 const cheerio = require('cheerio');
 const datetime = require('../lib/datetime');
 const log = require('debug')('scraper:arsenal');
+const moment = require('moment-timezone');
 const request = require('request');
 const url = require('url');
 
@@ -18,7 +19,7 @@ module.exports = (callback) => {
 
     $('.dayWrapper').each((_, elem) => {
       const $dayElem = $(elem);
-      const date = datetime.toUTC(new Date($dayElem.text()));
+      const date = datetime.toUTC(moment($dayElem.text()));
 
       $dayElem
         .nextUntil('.dayWrapper')
@@ -39,7 +40,7 @@ module.exports = (callback) => {
             }
           }, null);
 
-          const showtime = new Date(date);
+          const showtime = datetime.parse(date);
           const [ time, ampm ] = headerTokens.eq(0).text().split(' ');
           const [ hours, minutes ] = time.split(':');
           showtime.setUTCHours(parseInt(hours, 10) + (/pm/.test(ampm) ? 12 : 0));

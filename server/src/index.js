@@ -63,12 +63,11 @@ const locationMatches = (city) => ({ location }) => {
 function daysFromNow(days) {
   const today = datetime.todayUTC();
   // Cut-off is 3am to account for midnight movies
-  const start = addHours(addDays(today, days), 3);
-  const end = addDays(start, 1);
+  const start = today.clone().add(days, 'day').add(3, 'hour');
+  const end = start.clone().add(1, 'day');
 
   return ({ showtime }) => {
-    const showtimeDate = new Date(showtime);
-    return showtimeDate >= start && showtimeDate < end;
+    return showtime.isAfter(start) && showtime.isBefore(end);
   };
 }
 
@@ -77,9 +76,8 @@ function pad(number) {
 }
 
 function toTemplateData({ deepLink, language, location, showtime, title }) {
-  const showtimeDate = new Date(showtime);
-  const hours = pad(showtimeDate.getUTCHours());
-  const minutes = pad(showtimeDate.getUTCMinutes());
+  const hours = pad(showtime.hour());
+  const minutes = pad(showtime.minute());
   const textSearch = [ title, location, language ]
     .filter(Boolean)
     .map((s) => s.toLowerCase())
@@ -100,10 +98,8 @@ scraper.getShowtimes(Object.values(config.locations.chicago))
   .then((showtimes) => {
     // sort by date
     return showtimes.sort(({ showtime: a }, { showtime: b }) => {
-      if (a === b) return 0;
-      const aDate = Date.parse(a);
-      const bDate = Date.parse(b);
-      if (aDate < bDate) return -1;
+      if (a.isSame(b)) return 0;
+      else if (a.isBefore(b)) return -1;
       else return 1;
     });
   })

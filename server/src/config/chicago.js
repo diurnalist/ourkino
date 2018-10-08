@@ -8,7 +8,7 @@ module.exports = {
   'doc films': ical('Doc Films', gcalURL('docfilms.org_kdpc8vchre778r95fhl7eenm4o@group.calendar.google.com'), {
     onEvent({ start, summary }) {
       // Adjust date to central time
-      const chicagoDate = new Date(moment(start).tz('America/Chicago').format());
+      const chicagoDate = moment(start).tz('America/Chicago');
       return {
         showtime: toUTC(chicagoDate)
       };

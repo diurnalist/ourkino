@@ -1,3 +1,4 @@
+const { parse } = require('../datetime');
 const request = require('request');
 const split = require('split');
 const url = require('url');
@@ -44,7 +45,7 @@ module.exports = (location, permalink) => (callback) => {
 
         const deepLink = show.url && url.resolve(host, show.url);
         const language = show.flags[0] || null;
-        const showtime = new Date(`${show.date}T${show.time}Z`);
+        const showtime = parse(`${show.date}T${show.time}Z`);
         const title = movie.name.replace(/\((ov|ome?u)\)/i, '').trim();
 
         showtimes.push({
