@@ -71,6 +71,27 @@ function daysFromNow(days, timezone) {
   };
 }
 
+function dedupe() {
+  const seenPairs = [];
+  const isSeen = ({ title, showtime, location }) => {
+    for (let pair, i = 0; pair = seenPairs[i++];) {
+      if (title === pair.title &&
+          showtime.isSame(pair.showtime) &&
+          location === pair.location) return true;
+    }
+    return false;
+  };
+  return ({ title, showtime, location }) => {
+    const pair = { title, showtime, location };
+    if (isSeen(pair)) {
+      return false;
+    } else {
+      seenPairs.push(pair);
+      return true;
+    }
+  };
+}
+
 function pad(number) {
   return (number < 10 ? '0' : '') + number;
 }
@@ -108,11 +129,9 @@ scraper.getShowtimes(Object.values(config.locations.chicago))
   })
   .then((showtimes) => {
     return new Promise((resolve, reject) => {
-      const today = showtimes.filter(daysFromNow(0, timezone)).map(toTemplateData);
-      const tomorrow = showtimes.filter(daysFromNow(1, timezone)).map(toTemplateData);
-
-      console.log('started with ' + showtimes.length);
-      console.log('ended with ' + (today.length + tomorrow.length));
+      const deduped = showtimes.filter(dedupe());
+      const today = deduped.filter(daysFromNow(0, timezone)).map(toTemplateData);
+      const tomorrow = deduped.filter(daysFromNow(1, timezone)).map(toTemplateData);
 
       getTemplate()
         .then((template) => {

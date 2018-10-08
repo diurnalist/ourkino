@@ -10,6 +10,7 @@ module.exports = {
   'doc films': ical('Doc Films', gcalURL('docfilms.org_kdpc8vchre778r95fhl7eenm4o@group.calendar.google.com'), {
     onEvent({ start, summary }) {
       return {
+        deepLink: 'http://docfilms.uchicago.edu/dev',
         showtime: moment(start).tz(timezone)
       };
     }
