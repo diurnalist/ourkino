@@ -11,7 +11,7 @@ const host = 'https://www.imdb.com';
 const deepLinkReplaceRegex = /showtimes\/(title\/[^\/]+)\/.*$/;
 
 function showtimesUrlForDate(permalink, date) {
-  let day = date.date() + 1;
+  let day = date.date();
   if (day < 10) day = '0' + day;
   let month = date.month() + 1;
   if (month < 10) month = '0' + month;
@@ -19,14 +19,14 @@ function showtimesUrlForDate(permalink, date) {
   return url.resolve(host, `showtimes/cinema/US/${permalink}/US/12345/${formatted}`)
 }
 
-module.exports = (location, permalink) => (callback) => {
+module.exports = (location, timezone, permalink) => (callback) => {
   const log = require('debug')(`scraper:${location.toLowerCase().replace(' ', '')}`);
-  const today = datetime.todayUTC();
-  const tomorrow = today.add(1, 'day');
+  const today = datetime.today(timezone);
+  const tomorrow = today.clone().add(1, 'day');
 
   const showtimesForDate = (date) => (callback) => {
     showtimesUrl = showtimesUrlForDate(permalink, date);
-    log(showtimesUrl)
+    log(showtimesUrl);
     request(showtimesUrl, (err, res) => {
       if (err) {
         return callback(err);
@@ -48,7 +48,7 @@ module.exports = (location, permalink) => (callback) => {
         showtimesTokens.forEach(([time, ampm]) => {
           let showtime = date.clone();
           const [hours, minutes] = time.split(':').map((s) => parseInt(s));
-          showtime = date.set('hour', hours).set('minute', minutes);
+          showtime.set('hour', hours).set('minute', minutes);
           if (ampm !== 'am') showtime.add(12, 'hour');
 
           showtimes.push({

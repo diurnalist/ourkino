@@ -60,10 +60,10 @@ const locationMatches = (city) => ({ location }) => {
   return !!config.locations[city].find((configLocation) => locationSearch.indexOf(configLocation) >= 0);
 };
 
-function daysFromNow(days) {
-  const today = datetime.todayUTC();
+function daysFromNow(days, timezone) {
+  const today = datetime.today(timezone);
   // Cut-off is 3am to account for midnight movies
-  const start = today.clone().add(days, 'day').add(3, 'hour');
+  const start = today.clone().add(days, 'day').set('hour', 3);
   const end = start.clone().add(1, 'day');
 
   return ({ showtime }) => {
@@ -94,6 +94,9 @@ function toTemplateData({ deepLink, language, location, showtime, title }) {
   };
 }
 
+// TODO: parameterize by location
+const timezone = 'America/Chicago';
+
 scraper.getShowtimes(Object.values(config.locations.chicago))
   .then((showtimes) => {
     // sort by date
@@ -105,8 +108,11 @@ scraper.getShowtimes(Object.values(config.locations.chicago))
   })
   .then((showtimes) => {
     return new Promise((resolve, reject) => {
-      const today = showtimes.filter(daysFromNow(0)).map(toTemplateData);
-      const tomorrow = showtimes.filter(daysFromNow(1)).map(toTemplateData);
+      const today = showtimes.filter(daysFromNow(0, timezone)).map(toTemplateData);
+      const tomorrow = showtimes.filter(daysFromNow(1, timezone)).map(toTemplateData);
+
+      console.log('started with ' + showtimes.length);
+      console.log('ended with ' + (today.length + tomorrow.length));
 
       getTemplate()
         .then((template) => {

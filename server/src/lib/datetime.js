@@ -9,6 +9,10 @@ module.exports = {
     return moment();
   },
 
+  today(timezone) {
+    return moment().tz(timezone).startOf('day');
+  },
+
   todayUTC() {
     return moment().utc().startOf('day');
   },

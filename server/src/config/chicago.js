@@ -4,18 +4,18 @@ const { gcalURL } = require('../lib/utils');
 const moment = require('moment-timezone');
 const { toUTC } = require('../lib/datetime');
 
+const timezone = 'America/Chicago';
+
 module.exports = {
   'doc films': ical('Doc Films', gcalURL('docfilms.org_kdpc8vchre778r95fhl7eenm4o@group.calendar.google.com'), {
     onEvent({ start, summary }) {
-      // Adjust date to central time
-      const chicagoDate = moment(start).tz('America/Chicago');
       return {
-        showtime: toUTC(chicagoDate)
+        showtime: moment(start).tz(timezone)
       };
     }
   }),
-  'gene siskel':       imdb('Gene Siskel', 'ci0006584'),
-  'icon at roosevelt': imdb('ICON at Roosevelt', 'ci0015247'),
-  'logan':             imdb('Logan Theater', 'ci0005986'),
-  'music box':         imdb('Music Box', 'ci91815395')
+  'gene siskel':       imdb('Gene Siskel', timezone, 'ci0006584'),
+  'icon at roosevelt': imdb('ICON at Roosevelt', timezone, 'ci0015247'),
+  'logan':             imdb('Logan Theater', timezone, 'ci0005986'),
+  'music box':         imdb('Music Box', timezone, 'ci91815395')
 };
