@@ -63,9 +63,8 @@ const locationMatches = (city) => ({ location }) => {
 function daysFromNow(days) {
   const today = datetime.todayUTC();
   // Cut-off is 3am to account for midnight movies
-  const hourOffset = 3;
-  const start = addHours(addDays(today, days), hourOffset);
-  const end = addHours(addDays(start, 1), hourOffset);
+  const start = addHours(addDays(today, days), 3);
+  const end = addDays(start, 1);
 
   return ({ showtime }) => {
     const showtimeDate = new Date(showtime);
@@ -97,8 +96,7 @@ function toTemplateData({ deepLink, language, location, showtime, title }) {
   };
 }
 
-scraper.getShowtimes()
-  .then((showtimes) => showtimes.filter(locationMatches('chicago')))
+scraper.getShowtimes(Object.values(config.locations.chicago))
   .then((showtimes) => {
     // sort by date
     return showtimes.sort(({ showtime: a }, { showtime: b }) => {
