@@ -62,9 +62,9 @@ const locationMatches = (city) => ({ location }) => {
 
 function daysFromNow(days) {
   const today = datetime.todayUTC();
+  const start = addDays(today, days);
   // Cut-off is 3am to account for midnight movies
-  const start = addHours(addDays(today, days), 3);
-  const end = addDays(start, 1);
+  const end = addHours(addDays(start, 1), 3);
 
   return ({ showtime }) => {
     const showtimeDate = new Date(showtime);
