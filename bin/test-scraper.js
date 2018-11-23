@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const { locations } = require('./server/dist/config');
+const { locations } = require('../src/config');
 const allScrapers = Object.assign.apply({}, Object.values(locations));
 const scraperName = process.argv[2].toLowerCase();
 const scraper = allScrapers[scraperName];

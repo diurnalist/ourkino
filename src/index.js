@@ -1,16 +1,15 @@
-const addDays = require('date-fns/add_days');
-const addHours = require('date-fns/add_hours');
 const async = require('async');
 const config = require('./config');
 const datetime = require('./lib/datetime');
-const fs = require('fs');
+const { pad } = require('./lib/utils');
+const fs = require('fs-extra');
 const handlebars = require('handlebars');
 const path = require('path');
 const program = require('commander');
 const scraper = require('./scraper');
 
 program
-  .version('0.0.1')
+  .version(require('../package.json').version)
   .option('-o, --output-dir [dir]', 'Output directory')
   .option('-w, --watch', 'Watch templates and recompile on template change')
   .parse(process.argv);
@@ -18,18 +17,18 @@ program
 // Properly report stack traces on errors triggered from Promise chains
 process.on('unhandledRejection', (err) => console.log(err));
 
-const outputDir = program.outputDir || path.resolve(__dirname, '../public');
+const outputDir = program.outputDir || path.resolve(__dirname, '../dist');
 const watch = program.watch;
 
 const getTemplate = (() => {
-  const indexTemplate = '../index.tmpl';
-  const showtimeTemplate = '../showtime.tmpl';
+  const indexTemplate = path.resolve(__dirname, '../public/index.tmpl');
+  const showtimeTemplate = path.resolve(__dirname, '../public/showtime.tmpl');
 
   function compile() {
-    return getContents(indexTemplate)
+    return fs.readFile(indexTemplate, 'utf8')
       .then(handlebars.compile)
       .then((template) => {
-        return getContents(showtimeTemplate)
+        return fs.readFile(showtimeTemplate, 'utf8')
           .then((partial) => handlebars.registerPartial('showtime', partial))
           .then(() => template);
       });
@@ -45,15 +44,6 @@ const getTemplate = (() => {
 
   return () => template;
 })();
-
-function getContents(relativePath) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(path.resolve(__dirname, relativePath), (err, contents) => {
-      if (err) reject(err);
-      else resolve(contents.toString());
-    });
-  });
-}
 
 const locationMatches = (city) => ({ location }) => {
   const locationSearch = location.toLowerCase();
@@ -92,10 +82,6 @@ function dedupe() {
   };
 }
 
-function pad(number) {
-  return (number < 10 ? '0' : '') + number;
-}
-
 function toTemplateData({ deepLink, language, location, showtime, title }) {
   const hours = pad(showtime.hour());
   const minutes = pad(showtime.minute());
@@ -118,30 +104,32 @@ function toTemplateData({ deepLink, language, location, showtime, title }) {
 // TODO: parameterize by location
 const timezone = 'America/Chicago';
 
-scraper.getShowtimes(Object.values(config.locations.chicago))
-  .then((showtimes) => {
-    // sort by date
-    return showtimes.sort(({ showtime: a }, { showtime: b }) => {
-      if (a.isSame(b)) return 0;
-      else if (a.isBefore(b)) return -1;
-      else return 1;
-    });
+fs.ensureDir(outputDir)
+  .then(() => {
+    return scraper.getShowtimes(Object.values(config.locations.chicago))
+      .then((showtimes) => {
+        // sort by date
+        return showtimes.sort(({ showtime: a }, { showtime: b }) => {
+          if (a.isSame(b)) return 0;
+          else if (a.isBefore(b)) return -1;
+          else return 1;
+        });
+      })
   })
   .then((showtimes) => {
-    return new Promise((resolve, reject) => {
-      const deduped = showtimes.filter(dedupe());
-      const today = deduped.filter(daysFromNow(0, timezone)).map(toTemplateData);
-      const tomorrow = deduped.filter(daysFromNow(1, timezone)).map(toTemplateData);
+    const deduped = showtimes.filter(dedupe());
+    const today = deduped.filter(daysFromNow(0, timezone)).map(toTemplateData);
+    const tomorrow = deduped.filter(daysFromNow(1, timezone)).map(toTemplateData);
 
-      getTemplate()
-        .then((template) => {
-          fs.writeFile(path.join(outputDir, 'index.html'), template({ today, tomorrow }), (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve();
-            }
-          });
+    return getTemplate()
+      .then((template) => {
+        return fs.writeFile(path.join(outputDir, 'index.html'), template({ today, tomorrow }));
+      })
+      .then(() => {
+        return fs.copy(path.resolve(__dirname, '../public'), outputDir, {
+          filter(src) {
+            return ! /\.tmpl/.test(src);
+          }
         });
-    });
+      });
   });
