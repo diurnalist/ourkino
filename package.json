@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "bin/build.js",
+    "interactive-update": "npm-check --update",
     "test": "echo \"Error: no test specified\" && exit 1",
     "test-scraper": "bin/test-scraper.js"
   },
@@ -21,20 +22,20 @@
   "dependencies": {
     "async": "^2.1.4",
     "cheerio": "^0.22.0",
-    "commander": "^2.9.0",
+    "commander": "^2.19.0",
     "date-fns": "^1.21.0",
-    "debug": "^2.4.4",
+    "debug": "^4.1.0",
     "fs-extra": "^7.0.1",
     "handlebars": "^4.0.6",
     "ical": "^0.5.0",
     "levenshtein": "^1.0.5",
-    "moment-timezone": "^0.5.21",
+    "moment-timezone": "^0.5.23",
     "request": "^2.79.0",
     "split": "^1.0.0",
     "through": "^2.3.8"
   },
   "devDependencies": {
-    "chokidar": "^1.6.1",
+    "chokidar": "^2.0.4",
     "npm-check": "^5.9.0"
   }
 }
