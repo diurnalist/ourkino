@@ -28,11 +28,9 @@
     "fs-extra": "^7.0.1",
     "handlebars": "^4.0.6",
     "ical": "^0.5.0",
-    "levenshtein": "^1.0.5",
     "moment-timezone": "^0.5.23",
     "request": "^2.79.0",
-    "split": "^1.0.0",
-    "through": "^2.3.8"
+    "split": "^1.0.0"
   },
   "devDependencies": {
     "chokidar": "^2.0.4",
