@@ -18,6 +18,7 @@ program
 process.on('unhandledRejection', (err) => console.log(err));
 
 const outputDir = program.outputDir || path.resolve(__dirname, '../dist');
+const publicDir = path.resolve(__dirname, '../public');
 const watch = program.watch;
 
 const getTemplate = (() => {
@@ -101,38 +102,49 @@ function toTemplateData({ deepLink, language, location, showtime, title }) {
   };
 }
 
-// TODO: parameterize by location
-const location = config.locations.berlin;
-const timezone = 'Europe/Berlin';
-// const location = config.locations.chicago;
-// const timezone = 'America/Chicago';
+function buildLocation(name, { timezone, kinos }, callback) {
+  const locationDir = path.resolve(outputDir, name);
 
-fs.ensureDir(outputDir)
-  .then(() => {
-    return scraper.getShowtimes(Object.values(location))
-      .then((showtimes) => {
-        // sort by date
-        return showtimes.sort(({ showtime: a }, { showtime: b }) => {
-          if (a.isSame(b)) return 0;
-          else if (a.isBefore(b)) return -1;
-          else return 1;
-        });
+  return fs.ensureDir(locationDir)
+    .then(() => {
+      return fs.copy(publicDir, locationDir, {
+        filter(src) {
+          return ! /\.tmpl/.test(src);
+        }
       })
-  })
-  .then((showtimes) => {
-    const deduped = showtimes.filter(dedupe());
-    const today = deduped.filter(daysFromNow(0, timezone)).map(toTemplateData);
-    const tomorrow = deduped.filter(daysFromNow(1, timezone)).map(toTemplateData);
-
-    return getTemplate()
-      .then((template) => {
-        return fs.writeFile(path.join(outputDir, 'index.html'), template({ today, tomorrow }));
-      })
-      .then(() => {
-        return fs.copy(path.resolve(__dirname, '../public'), outputDir, {
-          filter(src) {
-            return ! /\.tmpl/.test(src);
-          }
-        });
+    })
+    .then(() => scraper.getShowtimes(kinos))
+    .then((showtimes) => {
+      const sorted = showtimes.sort(({ showtime: a }, { showtime: b }) => {
+        if (a.isSame(b)) return 0;
+        else if (a.isBefore(b)) return -1;
+        else return 1;
       });
-  });
+      const deduped = sorted.filter(dedupe());
+      const today = deduped.filter(daysFromNow(0, timezone)).map(toTemplateData);
+      const tomorrow = deduped.filter(daysFromNow(1, timezone)).map(toTemplateData);
+
+      return getTemplate()
+        .then((template) => {
+          const indexHtml = path.join(locationDir, 'index.html');
+          return fs.writeFile(indexHtml, template({ today, tomorrow }));
+        });
+    })
+    .then(() => callback(null), callback);
+}
+
+const { locations } = config;
+
+async.parallel(
+  Object.keys(locations).map((name) => {
+    return (cb) => buildLocation(name, locations[name], cb);
+  }),
+  (err, res) => {
+    if (err) {
+      console.log(err);
+      process.exit(1);
+    } else {
+      process.exit();
+    }
+  }
+);

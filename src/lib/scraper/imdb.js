@@ -20,7 +20,7 @@ function showtimesUrlForDate(permalink, date) {
 }
 
 module.exports = (location, timezone, permalink) => (callback) => {
-  const log = require('debug')(`scraper:${location.toLowerCase().replace(' ', '')}`);
+  const log = require('debug')(`scraper:${location.toLowerCase().replace(/\s+/g, '')}`);
   const today = datetime.today(timezone);
   const tomorrow = today.clone().add(1, 'day');
 
