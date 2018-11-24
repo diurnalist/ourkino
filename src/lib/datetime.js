@@ -1,12 +1,12 @@
 const moment = require('moment-timezone');
 
 module.exports = {
-  parse(str) {
-    return moment(str);
-  },
-
-  now() {
-    return moment();
+  parse(str, timezone) {
+    if (timezone) {
+      return moment.tz(str, timezone);
+    } else {
+      return moment(str);
+    }
   },
 
   today(timezone) {

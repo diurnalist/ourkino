@@ -4,29 +4,28 @@ const split = require('split');
 const url = require('url');
 
 const dataExtractRegex = /dataLayer\.push\((.*?)\);$/;
-const host = 'https://www.kinoheld.de';
+const HOST = 'https://www.kinoheld.de';
+https://www.kinoheld.de/ajax/getShowsForCinemas?cinemaIds[]=670
 
-function getViewData(permalink) {
+function getViewData(cinemaId) {
   return new Promise((resolve, reject) => {
     request({
-      url: url.resolve(host, `kino-berlin/${permalink}`),
+      url: url.resolve(HOST, `ajax/getShowsForCinemas`),
       qs: {
-        layout: 'shows'
+        cinemaIds: [cinemaId]
+      },
+      json: true
+    }, (err, res) => {
+      if (err) {
+        return reject(err);
+      } else {
+        return resolve(res.body);
       }
-    })
-    .pipe(split())
-    .on('data', (line) => {
-      const [, json] = line.match(dataExtractRegex) || [];
-
-      if (json) {
-        resolve(JSON.parse(json));
-      }
-    })
-    .on('error', reject);
+    });
   });
 }
 
-module.exports = (location, permalink) => (callback) => {
+module.exports = (location, timezone, permalink) => (callback) => {
   const log = require('debug')(`scraper:${location.toLowerCase().replace(' ', '')}`);
 
   log('starting');
@@ -43,9 +42,9 @@ module.exports = (location, permalink) => (callback) => {
           return; // Skip
         }
 
-        const deepLink = show.url && url.resolve(host, show.url);
+        const deepLink = show.url && url.resolve(HOST, show.url);
         const language = show.flags[0] || null;
-        const showtime = parse(`${show.date}T${show.time}Z`);
+        const showtime = parse(`${show.date}T${show.time}`, timezone);
         const title = movie.name.replace(/\((ov|ome?u)\)/i, '').trim();
 
         showtimes.push({

@@ -1,6 +1,6 @@
 const addDays = require('date-fns/add_days');
 const cheerio = require('cheerio');
-const datetime = require('../lib/datetime');
+const datetime = require('../datetime');
 const log = require('debug')('scraper:indiekino');
 const request = require('request');
 const url = require('url');

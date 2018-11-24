@@ -6,7 +6,11 @@ const scraper = allScrapers[scraperName];
 
 if (allScrapers.hasOwnProperty(scraperName)) {
   allScrapers[scraperName]((err, showtimes) => {
-    console.log(JSON.stringify(showtimes))
+    if (err) {
+      throw err;
+    } else {
+      console.log(JSON.stringify(showtimes));
+    }
   });
 } else {
   throw `Could not find scraper with name "${scraperName}"`

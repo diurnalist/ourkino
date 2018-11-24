@@ -1,5 +1,5 @@
 const cheerio = require('cheerio');
-const datetime = require('../lib/datetime');
+const datetime = require('../datetime');
 const log = require('debug')('scraper:arsenal');
 const moment = require('moment-timezone');
 const request = require('request');

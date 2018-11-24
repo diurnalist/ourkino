@@ -1,6 +1,6 @@
 module.exports = {
   locations: {
-    berlin: {},
+    berlin: require('./config/berlin'),
     chicago: require('./config/chicago')
   }
 };

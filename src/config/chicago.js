@@ -2,7 +2,6 @@ const ical = require('../lib/scraper/ical');
 const imdb = require('../lib/scraper/imdb');
 const { gcalURL } = require('../lib/utils');
 const moment = require('moment-timezone');
-const { toUTC } = require('../lib/datetime');
 
 const timezone = 'America/Chicago';
 

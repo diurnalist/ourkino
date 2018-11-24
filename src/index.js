@@ -92,7 +92,7 @@ function toTemplateData({ deepLink, language, location, showtime, title }) {
 
   return {
     deepLink,
-    isoTime: showtime,
+    isoTime: showtime.toISOString(),
     language,
     location,
     textSearch,
@@ -102,11 +102,14 @@ function toTemplateData({ deepLink, language, location, showtime, title }) {
 }
 
 // TODO: parameterize by location
-const timezone = 'America/Chicago';
+const location = config.locations.berlin;
+const timezone = 'Europe/Berlin';
+// const location = config.locations.chicago;
+// const timezone = 'America/Chicago';
 
 fs.ensureDir(outputDir)
   .then(() => {
-    return scraper.getShowtimes(Object.values(config.locations.chicago))
+    return scraper.getShowtimes(Object.values(location))
       .then((showtimes) => {
         // sort by date
         return showtimes.sort(({ showtime: a }, { showtime: b }) => {
