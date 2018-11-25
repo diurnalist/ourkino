@@ -43,7 +43,9 @@ module.exports = (location, timezone, permalink) => (callback) => {
         }
 
         const deepLink = show.url && url.resolve(HOST, show.url);
-        const language = show.flags[0] || null;
+        const language = show.flags
+          .filter(({ category }) => category === 'language')
+          .map(({ name }) => name)[0] || null;
         const showtime = parse(`${show.date}T${show.time}`, timezone);
         const title = movie.name.replace(/\((ov|ome?u)\)/i, '').trim();
 

@@ -141,5 +141,8 @@ module.exports = (location, timezone, cinemaId) => (callback) => {
     .then((showtimes) => {
       log(`got ${showtimes.length} results`);
       callback(null, showtimes);
-    }, callback);
+    }, (err) => {
+      log('error getting shows');
+      callback(err);
+    });
 };
