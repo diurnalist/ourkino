@@ -1,5 +1,7 @@
 # ourkino
 
+A simple movie showtime listing for a highly curated list of locations. Currently supports showtimes for 🇩🇪 **Berlin** and 🇺🇸 **Chicago**, because that is where I have resided.
+
 ## Building
 
 ```shell
