@@ -4,6 +4,8 @@ A simple movie showtime listing for a highly curated list of locations. Currentl
 
 This listing is biased towards independent cinemas. Particularly in Berlin, there was no single site that simply listed what films are playing across the subset of kinos that tend to run indie films.
 
+**[ourkino.com](https://ourkino.com)**
+
 ![screenshot](./screenshot.png)
 
 ## Building
