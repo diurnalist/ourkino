@@ -22,3 +22,7 @@ yarn install && yarn build
 # Pass in name of scraper as argument
 yarn run test-scraper -- 'gene siskel'
 ```
+
+## Acknowledgements
+
+For the Berlin listings, this relies heavily on the high-quality listing information assembled and presented by [kinoheld](https://www.kinoheld.de/). For the Chicago listings, it uses the showtime feeds from [IMDB](https://www.imdb.com/).
