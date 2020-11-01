@@ -1,10 +1,10 @@
-const arsenal = require('../lib/scraper/arsenal');
-const kinoheld = require('../lib/scraper/kinoheld');
-const yorck = require('../lib/scraper/yorck');
+// import arsenal from '../lib/scraper/arsenal';
+import kinoheld from '../lib/scraper/kinoheld.js';
+import yorck from '../lib/scraper/yorck.js';
 
 const timezone = 'Europe/Berlin';
 
-module.exports = {
+export default {
   timezone,
   kinos: [
     // 'arsenal':           arsenal,

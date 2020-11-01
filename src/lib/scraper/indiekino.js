@@ -1,11 +1,13 @@
-const addDays = require('date-fns/add_days');
-const cheerio = require('cheerio');
-const datetime = require('../datetime');
-const log = require('debug')('scraper:indiekino');
-const request = require('request');
-const url = require('url');
+import { addDays } from 'date-fns';
+import cheerio from 'cheerio';
+import { todayUTC, parse } from '../datetime.js';
+import debug from 'debug';
+import request from 'request';
+import url from 'url';
 
-module.exports = (callback) => {
+const log = debug('scraper:indiekino');
+
+export default (callback) => {
   log('starting');
 
   const host = 'http://www.indiekino.de';
@@ -20,7 +22,7 @@ module.exports = (callback) => {
 
     const showtimes = [];
 
-    const now = datetime.todayUTC();
+    const now = todayUTC();
     const dateColumns = $sections.map((i) => {
       return addDays(now, i);
     }).get();
@@ -37,7 +39,7 @@ module.exports = (callback) => {
           const title = anchor.length ? anchor.text() : $('.titel', item).text();
           const deepLink = anchor.length ? url.resolve(host, anchor.attr('href')) : null;
 
-          const showtime = datetime.parse(dateColumns[i]);
+          const showtime = parse(dateColumns[i]);
           showtime.setUTCHours(hours);
           showtime.setUTCMinutes(minutes);
 

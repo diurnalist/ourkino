@@ -1,11 +1,9 @@
-const addDays = require('date-fns/add_days');
-const addHours = require('date-fns/add_hours');
-const addMinutes = require('date-fns/add_minutes');
-const async = require('async');
-const cheerio = require('cheerio');
-const datetime = require('../datetime');
-const request = require('request');
-const url = require('url');
+import async from 'async';
+import cheerio from 'cheerio';
+import request from 'request';
+import url from 'url';
+import debug from 'debug';
+import { today } from '../datetime.js';
 
 const host = 'https://www.imdb.com';
 const deepLinkReplaceRegex = /showtimes\/(title\/[^\/]+)\/.*$/;
@@ -19,13 +17,13 @@ function showtimesUrlForDate(permalink, date) {
   return url.resolve(host, `showtimes/cinema/US/${permalink}/US/12345/${formatted}`)
 }
 
-module.exports = (location, timezone, permalink) => (callback) => {
-  const log = require('debug')(`scraper:${location.toLowerCase().replace(/\s+/g, '')}`);
-  const today = datetime.today(timezone);
-  const tomorrow = today.clone().add(1, 'day');
+export default (location, timezone, permalink) => (callback) => {
+  const log = debug(`scraper:${location.toLowerCase().replace(/\s+/g, '')}`);
+  const todayDatetime = today(timezone);
+  const tomorrow = todayDatetime.clone().add(1, 'day');
 
   const showtimesForDate = (date) => (callback) => {
-    showtimesUrl = showtimesUrlForDate(permalink, date);
+    const showtimesUrl = showtimesUrlForDate(permalink, date);
     log(showtimesUrl);
     request(showtimesUrl, (err, res) => {
       if (err) {
@@ -66,7 +64,7 @@ module.exports = (location, timezone, permalink) => (callback) => {
   };
 
   log('starting');
-  async.parallel([showtimesForDate(today), showtimesForDate(tomorrow)], (err, data) => {
+  async.parallel([showtimesForDate(todayDatetime), showtimesForDate(tomorrow)], (err, data) => {
     if (err) {
       callback(err);
     } else {

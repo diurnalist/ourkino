@@ -1,15 +1,18 @@
-const async = require('async');
-const config = require('./config');
-const datetime = require('./lib/datetime');
-const { pad } = require('./lib/utils');
-const fs = require('fs-extra');
-const handlebars = require('handlebars');
-const path = require('path');
-const program = require('commander');
-const scraper = require('./scraper');
+import async from 'async';
+import handlebars from 'handlebars';
+import locations from './config/index.js';
+import { today } from './lib/datetime.js';
+import { pad } from './lib/utils.js';
+import fs from 'fs-extra';
+import path from 'path';
+import program from 'commander';
+import { fileURLToPath } from 'url';
+import { getShowtimes } from './scraper.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 program
-  .version(require('../package.json').version)
+  .version(process.env.npm_package_version)
   .option('-o, --output-dir [dir]', 'Output directory')
   .option('-w, --watch', 'Watch templates and recompile on template change')
   .parse(process.argv);
@@ -48,13 +51,13 @@ const getTemplate = (() => {
 
 const locationMatches = (city) => ({ location }) => {
   const locationSearch = location.toLowerCase();
-  return !!config.locations[city].find((configLocation) => locationSearch.indexOf(configLocation) >= 0);
+  return !!locations[city].find((loc) => locationSearch.indexOf(loc) >= 0);
 };
 
 function daysFromNow(days, timezone) {
-  const today = datetime.today(timezone);
+  const todayDatetime = today(timezone);
   // Cut-off is 3am to account for midnight movies
-  const start = today.clone().add(days, 'day').set('hour', 3);
+  const start = todayDatetime.clone().add(days, 'day').set('hour', 3);
   const end = start.clone().add(1, 'day');
 
   return ({ showtime }) => {
@@ -113,7 +116,7 @@ function buildLocation(name, { timezone, kinos }, callback) {
         }
       })
     })
-    .then(() => scraper.getShowtimes(kinos))
+    .then(() => getShowtimes(kinos))
     .then((showtimes) => {
       const sorted = showtimes.sort(({ showtime: a }, { showtime: b }) => {
         if (a.isSame(b)) return 0;
@@ -133,9 +136,7 @@ function buildLocation(name, { timezone, kinos }, callback) {
     .then(() => callback(null), callback);
 }
 
-const { locations } = config;
-
-async.parallel(
+export default () => async.parallel(
   Object.keys(locations).map((name) => {
     return (cb) => buildLocation(name, locations[name], cb);
   }),

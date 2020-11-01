@@ -3,7 +3,7 @@
 ## Building
 
 ```shell
-npm install && npm run build
+yarn install && yarn build
 ```
 
 ## Testing
@@ -12,5 +12,5 @@ npm install && npm run build
 
 ```shell
 # Pass in name of scraper as argument
-npm run test-scraper -- 'gene siskel'
+yarn run test-scraper -- 'gene siskel'
 ```

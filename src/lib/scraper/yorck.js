@@ -1,10 +1,8 @@
-const addDays = require('date-fns/add_days');
-const async = require('async');
-const cheerio = require('cheerio');
-const datetime = require('../datetime');
-const request = require('request');
-const url = require('url');
-const vm = require('vm');
+import cheerio from 'cheerio';
+import request from 'request';
+import vm from 'vm';
+import debug from 'debug';
+import { today } from '../datetime.js';
 
 const HOST = 'https://yorck.de';
 const htmlFragmentCaptureRegex = /\.replaceWith\((.*?)\);$/;
@@ -66,7 +64,7 @@ const extractShowtimes = (location, timezone) => (showtimesHTMLFragment) => {
   const $ = cheerio.load(showtimesHTMLFragment.replace(/\r?\n/g, ''));
 
   const showtimes = [];
-  const today = datetime.today(timezone);
+  const todayDatetime = today(timezone);
 
   // Structure of fragment:
   // There are two renderings of the program, one for wide browsers (.hidden-xs)
@@ -99,7 +97,7 @@ const extractShowtimes = (location, timezone) => (showtimesHTMLFragment) => {
       throw 'Error parsing date from HTML fragment';
     }
 
-    const baseDate = today.clone();
+    const baseDate = todayDatetime.clone();
     // Handle case where we fetch showtimes in next year
     if (baseDate.month() + 1 == 12 && month == 1) {
       baseDate.add(1, 'year');
@@ -132,8 +130,8 @@ const extractShowtimes = (location, timezone) => (showtimesHTMLFragment) => {
   return showtimes;
 };
 
-module.exports = (location, timezone, cinemaId) => (callback) => {
-  const log = require('debug')(`scraper:${location.toLowerCase().replace(' ', '')}`);
+export default (location, timezone, cinemaId) => (callback) => {
+  const log = debug(`scraper:${location.toLowerCase().replace(' ', '')}`);
 
   log('starting');
   getShowtimesHTMLFragment(cinemaId)

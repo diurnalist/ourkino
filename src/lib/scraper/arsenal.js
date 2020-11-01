@@ -5,7 +5,7 @@ const moment = require('moment-timezone');
 const request = require('request');
 const url = require('url');
 
-module.exports = (callback) => {
+export default (callback) => {
   log('starting');
   const host = 'http://www.arsenal-berlin.de';
 

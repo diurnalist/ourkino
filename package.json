@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "A minimal showtimes listing supporting only cities relevant to the author.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "build": "bin/build.js",
-    "interactive-update": "npm-check --update",
     "test": "echo \"Error: no test specified\" && exit 1",
     "test-scraper": "bin/test-scraper.js"
   },
@@ -14,26 +14,26 @@
     "url": "https://github.com/diurnalist/ourkino.com"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/diurnalist/ourkino.com/issues"
   },
   "homepage": "https://github.com/diurnalist/ourkino.com#readme",
   "dependencies": {
-    "async": "^2.1.4",
+    "async": "^3.2.0",
     "cheerio": "^0.22.0",
-    "commander": "^2.19.0",
-    "date-fns": "^1.21.0",
-    "debug": "^4.1.0",
-    "fs-extra": "^7.0.1",
-    "handlebars": "^4.0.6",
-    "ical": "^0.5.0",
-    "moment-timezone": "^0.5.23",
-    "request": "^2.79.0",
-    "split": "^1.0.0"
+    "commander": "^6.2.0",
+    "date-fns": "^2.16.1",
+    "debug": "^4.3.0",
+    "esm": "^3.2.25",
+    "fs-extra": "^9.0.1",
+    "handlebars": "^4.7.6",
+    "node-ical": "^0.12.3",
+    "moment-timezone": "^0.5.31",
+    "request": "^2.88.2",
+    "split": "^1.0.1"
   },
   "devDependencies": {
-    "chokidar": "^2.0.4",
-    "npm-check": "^5.9.0"
+    "chokidar": "^3.4.3"
   }
 }

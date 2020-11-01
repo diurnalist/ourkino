@@ -1,2 +1,3 @@
 #!/usr/bin/env node
-require('../src');
+import build from '../src/index.js';
+build();

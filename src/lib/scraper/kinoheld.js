@@ -1,11 +1,9 @@
-const { parse } = require('../datetime');
-const request = require('request');
-const split = require('split');
-const url = require('url');
+import { parse } from '../datetime.js';
+import request from 'request';
+import url from 'url';
+import debug from 'debug';
 
-const dataExtractRegex = /dataLayer\.push\((.*?)\);$/;
 const HOST = 'https://www.kinoheld.de';
-https://www.kinoheld.de/ajax/getShowsForCinemas?cinemaIds[]=670
 
 function getViewData(cinemaId) {
   return new Promise((resolve, reject) => {
@@ -25,8 +23,8 @@ function getViewData(cinemaId) {
   });
 }
 
-module.exports = (location, timezone, permalink) => (callback) => {
-  const log = require('debug')(`scraper:${location.toLowerCase().replace(' ', '')}`);
+export default (location, timezone, permalink) => (callback) => {
+  const log = debug(`scraper:${location.toLowerCase().replace(' ', '')}`);
 
   log('starting');
   getViewData(permalink)

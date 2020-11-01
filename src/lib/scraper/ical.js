@@ -1,11 +1,12 @@
-const ical = require('ical');
-const { parse } = require('../datetime');
+import ical from 'node-ical';
+import { parse } from '../datetime.js';
+import debug from 'debug';
 
-module.exports = (location, url, { onEvent } = {}) => (callback) => {
-  const log = require('debug')(`scraper:${location.toLowerCase().replace(' ', '')}`);
+export default (location, url, { onEvent } = {}) => (callback) => {
+  const log = debug(`scraper:${location.toLowerCase().replace(' ', '')}`);
 
   log('starting');
-  ical.fromURL(url, {}, (err, data) => {
+  ical.async.fromURL(url, {}, (err, data) => {
     if (err) {
       return callback(err);
     }
