@@ -33,11 +33,17 @@ export default (location, timezone, permalink) => (callback) => {
 
       Object.keys(shows).forEach((key) => {
         const show = shows[key];
-        const movie = Object.values(movies).find(({ id }) => show.movieId === id);
-
-        if (!movie) {
-          log(`could not find entry for movie with id=${show.movieId}`);
-          return; // Skip
+        let title = show.name || '';
+        
+        if (show.movieId) {
+          const movie = Object.values(movies).find(({ id }) => show.movieId === id);
+          if (! movie) {
+            log(`could not find entry for movie with id=${show.movieId}`);
+            return; // Skip
+          }
+          if (movie.name) {
+            title = movie.name;
+          }
         }
 
         const deepLink = show.url && url.resolve(HOST, show.url);
@@ -45,7 +51,7 @@ export default (location, timezone, permalink) => (callback) => {
           .filter(({ category }) => category === 'language')
           .map(({ name }) => name)[0] || null;
         const showtime = parse(`${show.date}T${show.time}`, timezone);
-        const title = movie.name.replace(/\((ov|ome?u)\)/i, '').trim();
+        title = title.replace(/\((ov|ome?u)\)/i, '').trim();
 
         showtimes.push({
           deepLink,
