@@ -1,3 +1,8 @@
+html {
+  /* Reset 1rem = 10px */
+  font-size: 62.5%; 
+}
+
 body {
   font-family: 'Crete Round', serif;
 }
@@ -8,6 +13,11 @@ body {
 
 body   {
   background: #343d46;
+}
+
+#content-wrap {
+  max-width: 96rem;
+  margin: 0 auto;
 }
 
 a {
@@ -21,20 +31,20 @@ a[data-goto-page] {
 
 header {
   display: flex;
-  padding: 150px 50px 50px;
+  padding: 15rem 5rem 5rem;
 }
 
 .filter {
   display: flex;
-  padding: 0 50px;
+  padding: 0 5rem;
 }
 
 .filter > input {
   flex: 1;
-  font-size: 48px;
+  font-size: 4.8rem;
   font-family: inherit;
-  padding: 10px;
-  margin: -10px;
+  padding: 1rem;
+  margin: -1rem;
   background: #272c31;
   color: #d3e3ea;
   border: 0;
@@ -46,7 +56,7 @@ header {
 
 .page-header {
   flex: 0.25;
-  font-size: 48px;
+  font-size: 4.8rem;
   color: #d3e3ea;
 }
 
@@ -57,22 +67,22 @@ header {
 .showtime {
   display: flex;
   flex-flow: row wrap;
-  padding: 50px;
+  padding: 5rem;
 }
 
 .showtime-time {
   flex: 1;
-  font-size: 96px;
+  font-size: 9.6rem;
   color: #d3e3ea;
 }
 
 .showtime-info {
   flex: 3;
-  padding: 15px 0 0 50px;
+  padding: 1.5rem 0 0 5rem;
 }
 
 .showtime-title {
-  font-size: 48px;
+  font-size: 4.8rem;
   color: #93cce4;
   line-height: 1.1em;
 }
@@ -82,9 +92,9 @@ header {
 }
 
 .showtime-location {
-  font-size: 36px;
+  font-size: 3.6rem;
   text-transform: uppercase;
-  margin-top: 25px;
+  margin-top: 2.5rem;
   color: #2e8ab1;
-  letter-spacing: 8px;
+  letter-spacing: .8rem;
 }

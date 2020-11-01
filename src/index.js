@@ -1,20 +1,23 @@
 import async from 'async';
+import program from 'commander';
+import debug from 'debug';
+import fs from 'fs-extra';
 import handlebars from 'handlebars';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import locations from './config/index.js';
 import { today } from './lib/datetime.js';
 import { pad } from './lib/utils.js';
-import fs from 'fs-extra';
-import path from 'path';
-import program from 'commander';
-import { fileURLToPath } from 'url';
 import { getShowtimes } from './scraper.js';
 
+const log = debug('build');
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 program
   .version(process.env.npm_package_version)
   .option('-o, --output-dir [dir]', 'Output directory')
   .option('-w, --watch', 'Watch templates and recompile on template change')
+  .option('-l, --location [loc]', 'Only build certain location(s).')
   .parse(process.argv);
 
 // Properly report stack traces on errors triggered from Promise chains
@@ -22,32 +25,18 @@ process.on('unhandledRejection', (err) => console.log(err));
 
 const outputDir = program.outputDir || path.resolve(__dirname, '../dist');
 const publicDir = path.resolve(__dirname, '../public');
-const watch = program.watch;
+const indexTemplate = path.resolve(publicDir, 'index.tmpl');
+const showtimeTemplate = path.resolve(publicDir, 'showtime.tmpl');
 
-const getTemplate = (() => {
-  const indexTemplate = path.resolve(__dirname, '../public/index.tmpl');
-  const showtimeTemplate = path.resolve(__dirname, '../public/showtime.tmpl');
-
-  function compile() {
-    return fs.readFile(indexTemplate, 'utf8')
+function getTemplate() {
+  return fs.readFile(indexTemplate, 'utf8')
       .then(handlebars.compile)
       .then((template) => {
         return fs.readFile(showtimeTemplate, 'utf8')
           .then((partial) => handlebars.registerPartial('showtime', partial))
           .then(() => template);
       });
-  }
-
-  let template = compile();
-
-  if (watch) {
-    require('chokidar')
-      .watch([indexTemplate, showtimeTemplate])
-      .on('change', () => template = compile());
-  }
-
-  return () => template;
-})();
+}
 
 const locationMatches = (city) => ({ location }) => {
   const locationSearch = location.toLowerCase();
@@ -105,47 +94,57 @@ function toTemplateData({ deepLink, language, location, showtime, title }) {
   };
 }
 
-function buildLocation(name, { timezone, kinos }, callback) {
+async function buildLocation(name, showtimes) {
+  const { timezone } = locations[name];
   const locationDir = path.resolve(outputDir, name);
 
-  return fs.ensureDir(locationDir)
-    .then(() => {
-      return fs.copy(publicDir, locationDir, {
-        filter(src) {
-          return ! /\.tmpl/.test(src);
-        }
-      })
-    })
-    .then(() => getShowtimes(kinos))
-    .then((showtimes) => {
-      const sorted = showtimes.sort(({ showtime: a }, { showtime: b }) => {
-        if (a.isSame(b)) return 0;
-        else if (a.isBefore(b)) return -1;
-        else return 1;
-      });
-      const deduped = sorted.filter(dedupe());
-      const today = deduped.filter(daysFromNow(0, timezone)).map(toTemplateData);
-      const tomorrow = deduped.filter(daysFromNow(1, timezone)).map(toTemplateData);
+  await fs.ensureDir(locationDir);
+  await fs.copy(publicDir, locationDir, {
+    filter(src) {
+      return ! /\.tmpl/.test(src);
+    }
+  });
 
-      return getTemplate()
-        .then((template) => {
-          const indexHtml = path.join(locationDir, 'index.html');
-          return fs.writeFile(indexHtml, template({ today, tomorrow }));
-        });
-    })
-    .then(() => callback(null), callback);
+  const sorted = showtimes.sort(({ showtime: a }, { showtime: b }) => {
+    if (a.isSame(b)) return 0;
+    else if (a.isBefore(b)) return -1;
+    else return 1;
+  });
+  const template = await getTemplate();
+  const indexHtml = path.join(locationDir, 'index.html');
+  const deduped = sorted.filter(dedupe());
+  const today = deduped.filter(daysFromNow(0, timezone)).map(toTemplateData);
+  const tomorrow = deduped.filter(daysFromNow(1, timezone)).map(toTemplateData);
+  await fs.writeFile(indexHtml, template({ today, tomorrow }));
 }
 
-export default () => async.parallel(
-  Object.keys(locations).map((name) => {
-    return (cb) => buildLocation(name, locations[name], cb);
-  }),
-  (err, res) => {
-    if (err) {
-      console.log(err);
-      process.exit(1);
-    } else {
-      process.exit();
-    }
+export default async function build() {
+  const filteredLocations = Object.keys(locations).filter((name) => {
+    return !program.location || program.location === name;
+  });
+  const showtimes = await async.parallel(
+    filteredLocations.reduce((jobs, name) => {
+      const { kinos } = locations[name];
+      jobs[name] = getShowtimes.bind(null, kinos);
+      return jobs;
+    }, {})
+  );
+  
+  async function buildAllLocations() {
+    await async.parallel(
+      filteredLocations.map((name) => buildLocation.bind(null, name, showtimes[name]))
+    );
   }
-);
+
+  if (program.watch) {
+    const chokidar = await import('chokidar');
+    chokidar.watch(publicDir)
+      .on('change', () => {
+        buildAllLocations().then(() => log('Rebuilt output'));
+      })
+      .on('error', (err) => { throw err; });
+      log('Started watcher. Output directory will be refreshed on changes to static assets.')
+  } else {
+    await buildAllLocations();
+  }
+}

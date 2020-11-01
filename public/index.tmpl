@@ -7,26 +7,28 @@
   <link href="https://fonts.googleapis.com/css?family=Crete+Round" rel="stylesheet">
 </head>
 <body>
-  <header>
-    <h3 class="page-header"><a data-goto-page="today">Today</a></h3>
-    <h3 class="page-header inactive"><a data-goto-page="tomorrow">Tomorrow</a></h3>
-  </header>
-  <div class="filter">
-    <input type="text" placeholder="Filter by film/kino"/>
+  <div id="content-wrap">
+    <header>
+      <h3 class="page-header"><a data-goto-page="today">Today</a></h3>
+      <h3 class="page-header inactive"><a data-goto-page="tomorrow">Tomorrow</a></h3>
+    </header>
+    <div class="filter">
+      <input type="text" placeholder="Filter by film/kino"/>
+    </div>
+    <div class="page" data-page="today">
+      <ol class="showtimes">
+      {{#each today}}
+        {{>showtime }}
+      {{/each}}
+      </ol>
+    </div>
+    <div class="page inactive" data-page="tomorrow">
+      <ol class="showtimes">
+      {{#each tomorrow}}
+        {{>showtime }}
+      {{/each}}
+      </ol>
+    </div>
   </div>
-  <div class="page" data-page="today">
-    <ol class="showtimes">
-    {{#each today}}
-      {{>showtime }}
-    {{/each}}
-    </ol>
-  </div>
-  <div class="page inactive" data-page="tomorrow">
-    <ol class="showtimes">
-    {{#each tomorrow}}
-      {{>showtime }}
-    {{/each}}
-    </ol>
-  </div>
-  <script src="./js/page.js"></script>
+  <script src="./js/page.js" defer></script>
 </body>

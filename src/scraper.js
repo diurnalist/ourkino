@@ -4,15 +4,8 @@ import async from 'async';
 // sudden bursts of traffic, even minor.
 const concurrentTaskLimit = 4;
 
-export function getShowtimes(scrapers) {
-  return new Promise((resolve, reject) => {
-    async.parallelLimit(scrapers, concurrentTaskLimit, (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data.reduce((acc, list) => acc.concat(list), [])
-          .filter(Boolean));
-      }
-    });
-  });
+export async function getShowtimes(scrapers) {
+  const data = await async.parallelLimit(scrapers, concurrentTaskLimit);
+  const showtimes = data.reduce((acc, list) => acc.concat(list), []).filter(Boolean);
+  return showtimes;
 };
