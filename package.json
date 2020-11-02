@@ -1,9 +1,12 @@
 {
-  "name": "ourkino.com",
+  "name": "ourkino",
   "version": "1.0.0",
   "description": "A minimal showtimes listing supporting only cities relevant to the author.",
   "main": "index.js",
   "type": "module",
+  "bin": {
+    "ourkino": "bin/cli.js"
+  },
   "scripts": {
     "build": "bin/build.js",
     "show": "bin/cli.js",
