@@ -9,6 +9,7 @@ import { daysFromNow } from '../src/lib/datetime.js';
 import { toDisplayTime } from '../src/lib/utils.js';
 
 program
+  .name('ourkino')
   .version(process.env.npm_package_version)
   .option('-l, --location [loc]', 'Which location to display showtimes for', 'chicago')
   .parse(process.argv);
