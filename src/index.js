@@ -6,8 +6,8 @@ import handlebars from 'handlebars';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import locations from './config/index.js';
-import { today } from './lib/datetime.js';
-import { pad } from './lib/utils.js';
+import { daysFromNow } from './lib/datetime.js';
+import { toDisplayTime } from './lib/utils.js';
 import { getShowtimes } from './scraper.js';
 
 const log = debug('build');
@@ -38,46 +38,7 @@ function getTemplate() {
       });
 }
 
-const locationMatches = (city) => ({ location }) => {
-  const locationSearch = location.toLowerCase();
-  return !!locations[city].find((loc) => locationSearch.indexOf(loc) >= 0);
-};
-
-function daysFromNow(days, timezone) {
-  const todayDatetime = today(timezone);
-  // Cut-off is 3am to account for midnight movies
-  const start = todayDatetime.clone().add(days, 'day').set('hour', 3);
-  const end = start.clone().add(1, 'day');
-
-  return ({ showtime }) => {
-    return showtime.isAfter(start) && showtime.isBefore(end);
-  };
-}
-
-function dedupe() {
-  const seenPairs = [];
-  const isSeen = ({ title, showtime, location }) => {
-    for (let pair, i = 0; pair = seenPairs[i++];) {
-      if (title === pair.title &&
-          showtime.isSame(pair.showtime) &&
-          location === pair.location) return true;
-    }
-    return false;
-  };
-  return ({ title, showtime, location }) => {
-    const pair = { title, showtime, location };
-    if (isSeen(pair)) {
-      return false;
-    } else {
-      seenPairs.push(pair);
-      return true;
-    }
-  };
-}
-
 function toTemplateData({ deepLink, language, location, showtime, title }) {
-  const hours = pad(showtime.hour());
-  const minutes = pad(showtime.minute());
   const textSearch = [ title, location, language ]
     .filter(Boolean)
     .map((s) => s.toLowerCase())
@@ -89,7 +50,7 @@ function toTemplateData({ deepLink, language, location, showtime, title }) {
     language,
     location,
     textSearch,
-    time: `${hours}:${minutes}`,
+    time: toDisplayTime(showtime),
     title
   };
 }
@@ -105,16 +66,10 @@ async function buildLocation(name, showtimes) {
     }
   });
 
-  const sorted = showtimes.sort(({ showtime: a }, { showtime: b }) => {
-    if (a.isSame(b)) return 0;
-    else if (a.isBefore(b)) return -1;
-    else return 1;
-  });
   const template = await getTemplate();
   const indexHtml = path.join(locationDir, 'index.html');
-  const deduped = sorted.filter(dedupe());
-  const today = deduped.filter(daysFromNow(0, timezone)).map(toTemplateData);
-  const tomorrow = deduped.filter(daysFromNow(1, timezone)).map(toTemplateData);
+  const today = showtimes.filter(daysFromNow(0, timezone)).map(toTemplateData);
+  const tomorrow = showtimes.filter(daysFromNow(1, timezone)).map(toTemplateData);
   await fs.writeFile(indexHtml, template({ today, tomorrow }));
 }
 
@@ -122,7 +77,7 @@ export default async function build() {
   const filteredLocations = Object.keys(locations).filter((name) => {
     return !program.location || program.location === name;
   });
-  const showtimes = await async.parallel(
+  const allShowtimes = await async.parallel(
     filteredLocations.reduce((jobs, name) => {
       const { kinos } = locations[name];
       jobs[name] = getShowtimes.bind(null, kinos);
@@ -132,7 +87,7 @@ export default async function build() {
   
   async function buildAllLocations() {
     await async.parallel(
-      filteredLocations.map((name) => buildLocation.bind(null, name, showtimes[name]))
+      filteredLocations.map((name) => buildLocation.bind(null, name, allShowtimes[name]))
     );
   }
 

@@ -5,3 +5,9 @@ export function gcalURL(id) {
 export function pad(number) {
   return (number < 10 ? '0' : '') + number;
 };
+
+export function toDisplayTime(showtime) {
+  const hours = pad(showtime.hour());
+  const minutes = pad(showtime.minute());
+  return `${hours}:${minutes}`;
+}

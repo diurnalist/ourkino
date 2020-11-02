@@ -28,3 +28,14 @@ export function toUTC(date) {
   utcDate.millisecond(localDate.millisecond());
   return utcDate;
 };
+
+export function daysFromNow(days, timezone) {
+  const todayDatetime = today(timezone);
+  // Cut-off is 3am to account for midnight movies
+  const start = todayDatetime.clone().add(days, 'day').set('hour', 3);
+  const end = start.clone().add(1, 'day');
+
+  return ({ showtime }) => {
+    return showtime.isAfter(start) && showtime.isBefore(end);
+  };
+}

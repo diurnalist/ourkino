@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "bin/build.js",
+    "show": "bin/cli.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "test-scraper": "bin/test-scraper.js"
   },
@@ -21,6 +22,7 @@
   "homepage": "https://github.com/diurnalist/ourkino.com#readme",
   "dependencies": {
     "async": "^3.2.0",
+    "chalk": "^4.1.0",
     "cheerio": "^0.22.0",
     "commander": "^6.2.0",
     "date-fns": "^2.16.1",
@@ -28,10 +30,11 @@
     "esm": "^3.2.25",
     "fs-extra": "^9.0.1",
     "handlebars": "^4.7.6",
-    "node-ical": "^0.12.3",
     "moment-timezone": "^0.5.31",
+    "node-ical": "^0.12.3",
     "request": "^2.88.2",
-    "split": "^1.0.1"
+    "split": "^1.0.1",
+    "table": "^6.0.3"
   },
   "devDependencies": {
     "chokidar": "^3.4.3"
