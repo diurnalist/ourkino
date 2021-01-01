@@ -5,7 +5,7 @@ import fs from 'fs-extra';
 import handlebars from 'handlebars';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import locations from './config/index.js';
+import { locations, googleAnalytics } from './config/index.js';
 import { daysFromNow } from './lib/datetime.js';
 import { toDisplayTime } from './lib/utils.js';
 import { getShowtimes } from './scraper.js';
@@ -30,16 +30,16 @@ const showtimeTemplate = path.resolve(publicDir, 'showtime.tmpl');
 
 function getTemplate() {
   return fs.readFile(indexTemplate, 'utf8')
-      .then(handlebars.compile)
-      .then((template) => {
-        return fs.readFile(showtimeTemplate, 'utf8')
-          .then((partial) => handlebars.registerPartial('showtime', partial))
-          .then(() => template);
-      });
+    .then(handlebars.compile)
+    .then((template) => {
+      return fs.readFile(showtimeTemplate, 'utf8')
+        .then((partial) => handlebars.registerPartial('showtime', partial))
+        .then(() => template);
+    });
 }
 
 function toTemplateData({ deepLink, language, location, showtime, title }) {
-  const textSearch = [ title, location, language ]
+  const textSearch = [title, location, language]
     .filter(Boolean)
     .map((s) => s.toLowerCase())
     .join(' | ');
@@ -70,7 +70,7 @@ async function buildLocation(name, showtimes) {
   const indexHtml = path.join(locationDir, 'index.html');
   const today = showtimes.filter(daysFromNow(0, timezone)).map(toTemplateData);
   const tomorrow = showtimes.filter(daysFromNow(1, timezone)).map(toTemplateData);
-  await fs.writeFile(indexHtml, template({ today, tomorrow }));
+  await fs.writeFile(indexHtml, template({ today, tomorrow, googleAnalytics }));
 }
 
 export default async function build() {
@@ -84,7 +84,7 @@ export default async function build() {
       return jobs;
     }, {})
   );
-  
+
   async function buildAllLocations() {
     await async.parallel(
       filteredLocations.map((name) => buildLocation.bind(null, name, allShowtimes[name]))
@@ -98,7 +98,7 @@ export default async function build() {
         buildAllLocations().then(() => log('Rebuilt output'));
       })
       .on('error', (err) => { throw err; });
-      log('Started watcher. Output directory will be refreshed on changes to static assets.')
+    log('Started watcher. Output directory will be refreshed on changes to static assets.')
   } else {
     await buildAllLocations();
   }

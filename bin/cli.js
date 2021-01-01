@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import program from 'commander';
 import moment from 'moment-timezone';
 import { table } from 'table';
-import locations from '../src/config/index.js';
+import { locations } from '../src/config/index.js';
 import { getShowtimes } from '../src/scraper.js';
 import { daysFromNow } from '../src/lib/datetime.js';
 import { toDisplayTime } from '../src/lib/utils.js';
@@ -15,7 +15,7 @@ program
   .parse(process.argv);
 
 const { kinos, timezone } = locations[program.location];
-if (! kinos) {
+if (!kinos) {
   throw `Invalid location: "${program.location}"`;
 }
 
