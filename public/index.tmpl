@@ -19,6 +19,8 @@
       <ol class="showtimes">
       {{#each today}}
         {{>showtime }}
+      {{else}}
+        <li class="showtime"><p class="empty">No showtimes today :(</p></li>
       {{/each}}
       </ol>
     </div>
@@ -26,6 +28,8 @@
       <ol class="showtimes">
       {{#each tomorrow}}
         {{>showtime }}
+      {{else}}
+        <li class="showtime"><p class="empty">No showtimes tomorrow :(</p></li>
       {{/each}}
       </ol>
     </div>

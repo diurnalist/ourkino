@@ -1,6 +1,6 @@
 html {
   /* Reset 1rem = 10px */
-  font-size: 62.5%; 
+  font-size: 62.5%;
 }
 
 body {
@@ -81,7 +81,7 @@ header {
   padding: 1.5rem 0 0 5rem;
 }
 
-.showtime-title {
+.showtime-title, .empty {
   font-size: 4.8rem;
   color: #93cce4;
   line-height: 1.1em;
