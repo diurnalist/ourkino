@@ -1,9 +1,8 @@
 (function () {
 
   var doc = window.document;
-
-  doc.addEventListener('DOMContentLoaded', function (event) {
-
+  
+  function onLoad() {
     var showtimeEls = doc.querySelectorAll('.showtime');
     var filterEl = doc.querySelector('.filter > input');
     var gotoPageLinks = doc.querySelectorAll('[data-goto-page]');
@@ -50,7 +49,13 @@
         });
       });
     });
+  }
 
-  });
+  if (doc.readyState !== 'loading') {
+    // Safari in particular seems to run this payload after the DOM content event has fired.
+    onLoad()
+  } else {
+    doc.addEventListener('DOMContentLoaded', onLoad)
+  }
 
 })();
