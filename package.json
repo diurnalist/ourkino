@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/diurnalist/ourkino.com#readme",
   "dependencies": {
-    "async": "^3.2.0",
+    "async": "^3.2.2",
     "chalk": "^4.1.0",
     "cheerio": "^0.22.0",
     "commander": "^6.2.0",
