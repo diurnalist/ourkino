@@ -12,6 +12,7 @@ program
   .name('ourkino')
   .version(process.env.npm_package_version)
   .option('-l, --location [loc]', 'Which location to display showtimes for', 'chicago')
+  .option('--tomorrow', 'Display results for tomorrow instead of today')
   .parse(process.argv);
 
 const { kinos, timezone } = locations[program.location];
@@ -21,7 +22,7 @@ if (!kinos) {
 
 const showtimes = await getShowtimes(kinos);
 const rows = [['Time', 'Kino', 'Title']].concat(showtimes
-  .filter(daysFromNow(0, timezone))
+  .filter(daysFromNow(program.tomorrow ? 1 : 0, timezone))
   .filter(({ showtime }) => {
     return showtime.isAfter(moment().subtract(1, 'hours'))
   })

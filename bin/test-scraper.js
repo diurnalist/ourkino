@@ -1,8 +1,17 @@
 #!/usr/bin/env node
-const { locations } = require('../src/config');
-const allScrapers = Object.assign.apply({}, Object.values(locations));
+import { locations } from '../src/config/index.js';
+
+const allScrapers = Object.values(locations).reduce((acc, config) => {
+  for (var kino in config.kinos) {
+    acc[kino.name] = kino
+  }
+  return acc;
+}, {});
+console.log(allScrapers);
 const scraperName = process.argv[2].toLowerCase();
 const scraper = allScrapers[scraperName];
+
+console.log(allScrapers);
 
 if (allScrapers.hasOwnProperty(scraperName)) {
   allScrapers[scraperName]((err, showtimes) => {
