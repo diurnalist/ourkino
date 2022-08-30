@@ -33,7 +33,7 @@
     "esm": "^3.2.25",
     "fs-extra": "^9.0.1",
     "handlebars": "^4.7.6",
-    "moment-timezone": "^0.5.31",
+    "moment-timezone": "^0.5.35",
     "node-ical": "^0.12.3",
     "request": "^2.88.2",
     "split": "^1.0.1",
