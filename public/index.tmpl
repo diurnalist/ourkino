@@ -16,32 +16,46 @@
       <input type="text" placeholder="Filter by film/kino"/>
     </div>
     <div class="page" data-page="today">
+      {{define "showtime"}}
+      <li class="showtime" data-iso-time="{{ .ShowtimeISO }}" data-text-search="{{ .Search }}">
+        <div class="showtime-time">{{ .ShowtimeDisplay }}</div>
+        <div class="showtime-info">
+          <div class="showtime-title">
+            {{if .DeepLink}}<a href="{{ .DeepLink }}" target="_blank">{{end}}{{ .Film }}{{if .DeepLink}}</a>{{end}}
+            {{if .Language}}
+              <span class="showtime-language">{{ .Language }}</span>
+            {{end}}
+          </div>
+          <div class="showtime-location">{{ .Theatre }}</div>
+        </div>
+      </li>
+      {{end}}
       <ol class="showtimes">
-      {{#each today}}
-        {{>showtime }}
+      {{range .Today}}
+        {{template "showtime"}}
       {{else}}
         <li class="showtime"><p class="empty">No showtimes today :(</p></li>
-      {{/each}}
+      {{end}}
       </ol>
     </div>
     <div class="page inactive" data-page="tomorrow">
       <ol class="showtimes">
-      {{#each tomorrow}}
-        {{>showtime }}
+      {{range .Tomorrow}}
+        {{template "showtime"}}
       {{else}}
         <li class="showtime"><p class="empty">No showtimes tomorrow :(</p></li>
-      {{/each}}
+      {{end}}
       </ol>
     </div>
   </div>
   <script async src="./js/page.js"></script>
-  {{#if googleAnalytics}}
-  <script async src="https://www.googletagmanager.com/gtag/js?id={{googleAnalytics}}"></script>
+  {{if .GoogleAnalytics}}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{.GoogleAnalytics}}"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', '{{googleAnalytics}}');
+    gtag('config', '{{.GoogleAnalytics}}');
   </script>
-  {{/if}}
+  {{end}}
 </body>

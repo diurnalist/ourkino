@@ -1,0 +1,14 @@
+{
+  "name": "Chicago",
+  "days": 2,
+  "timezone": "America/Chicago",
+  "theatres": [
+    {
+      "name": "Icon Roosevelt",
+      "driver": "imdb",
+      "driverArgs": {
+        "permalink": "ci0015247"
+      }
+    }
+  ]
+}
