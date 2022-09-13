@@ -12,7 +12,7 @@ import (
 	"github.com/diurnalist/ourkino/internal/model"
 )
 
-const BaseUrl = "https://imdb.com"
+const baseUrl = "https://imdb.com"
 
 type imdbScraper struct {
 	Permalink string
@@ -24,7 +24,7 @@ func (s imdbScraper) Scrape(ch chan<- []model.Showtime, dates []time.Time, tz *t
 	for _, d := range dates {
 		path := fmt.Sprintf("/showtimes/cinema/US/%v/%v", s.Permalink, d.Format("2006-01-02"))
 		// TODO: more idiomatic way?
-		res, err := http.Get(BaseUrl + path)
+		res, err := http.Get(baseUrl + path)
 		if err != nil {
 			return err
 		}
@@ -43,9 +43,9 @@ func (s imdbScraper) Scrape(ch chan<- []model.Showtime, dates []time.Time, tz *t
 			deepLink, _ := s.Find("[itemprop=url]").Attr("href")
 			match := re.FindStringSubmatch(deepLink)
 			if match != nil {
-				deepLink = fmt.Sprintf("%v/title/%v", BaseUrl, match[1])
+				deepLink = fmt.Sprintf("%v/title/%v", baseUrl, match[1])
 			} else if len(deepLink) > 0 {
-				deepLink = BaseUrl + deepLink
+				deepLink = baseUrl + deepLink
 			}
 
 			rawShowtimes := strings.Fields(strings.ToLower(s.Find(".showtimes").Text()))
