@@ -24,16 +24,9 @@ func main() {
 	var err error
 
 	configFile := flag.String("config-file", "config.json", "path to a JSON config file")
-	days := flag.Int("days", 2, "number of days to collect showtimes for, from today")
 	output := flag.String("output", "html", "type of output to generate")
+	days := flag.Int("days", 2, "number of days to collect showtimes for, from today")
 	flag.Parse()
-
-	date, dayRange := StartOfDay(time.Now()), make([]time.Time, 1)
-	dayRange[0] = date
-	for i := 1; i < *days; i++ {
-		date = date.Add(time.Hour * 24)
-		dayRange = append(dayRange, date)
-	}
 
 	rawConfig, err := os.ReadFile(*configFile)
 	check(err)
@@ -48,6 +41,17 @@ func main() {
 	switch {
 	case len(conf.Theatres) < 1:
 		check(fmt.Errorf("no theatres defined in configuration"))
+	}
+
+	if conf.Days == 0 {
+		conf.Days = *days
+	}
+
+	date, dayRange := StartOfDay(time.Now()), make([]time.Time, 1)
+	dayRange[0] = date
+	for i := 1; i < conf.Days; i++ {
+		date = date.Add(time.Hour * 24)
+		dayRange = append(dayRange, date)
 	}
 
 	var wg sync.WaitGroup

@@ -8,6 +8,7 @@ type TheatreConfig struct {
 
 type Config struct {
 	Name     string
+	Days     int
 	Timezone string
 	Theatres []TheatreConfig
 }
