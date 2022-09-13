@@ -56,8 +56,9 @@ func main() {
 
 	var wg sync.WaitGroup
 	// Pass the set of all showtimes for a given theatre on a channel
-	ch := make(chan []model.Showtime, len(conf.Theatres))
-	for _, theatreConf := range conf.Theatres {
+	chanMap := make([]chan []model.Showtime, len(conf.Theatres))
+	for i, theatreConf := range conf.Theatres {
+		ch := make(chan []model.Showtime, 1)
 		wg.Add(1)
 		scraper, err := scraper.Instance(theatreConf.Driver, theatreConf.DriverArgs)
 		check(err)
@@ -66,14 +67,14 @@ func main() {
 			err := scraper.Scrape(ch, dayRange, timeLoc)
 			check(err)
 		}()
+		chanMap[i] = ch
 	}
 
 	wg.Wait()
 
 	entries := make([]model.ShowtimeEntry, 0)
-	for _, theatreConf := range conf.Theatres {
-		//MAJOR ERROR! Can't assume the channel data is ordered the same as the conf!!
-		for _, showtime := range <-ch {
+	for i, theatreConf := range conf.Theatres {
+		for _, showtime := range <-chanMap[i] {
 			entries = append(entries, model.ShowtimeEntry{Theatre: theatreConf.Name, Showtime: showtime})
 		}
 	}

@@ -44,6 +44,8 @@ type KinoheldResponse struct {
 
 func (s KinoheldScraper) Scrape(ch chan<- []model.Showtime, dates []time.Time, tz *time.Location) error {
 	var err error
+	showtimes := make([]model.Showtime, 0)
+
 	res, err := http.Get(fmt.Sprintf("%v/ajax/getShowsForCinemas?cinemaIds=%v", KinoheldBaseUrl, s.ID))
 	if err != nil {
 		return err
@@ -60,11 +62,9 @@ func (s KinoheldScraper) Scrape(ch chan<- []model.Showtime, dates []time.Time, t
 		// We treat this as an acceptable error for now; there is some interesting
 		// thing about kinoheld's API that I need to figure out still. Some supposedly
 		// valid cinemas return empty results on this endpoint.
-		ch <- nil
+		ch <- showtimes
 		return nil
 	}
-
-	showtimes := make([]model.Showtime, 0)
 
 	for _, kshow := range kres.Shows {
 		showtime, err := time.Parse(time.RFC3339, kshow.Beginning.ISOFull)
