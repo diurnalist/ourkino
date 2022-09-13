@@ -72,6 +72,7 @@ func main() {
 
 	entries := make([]model.ShowtimeEntry, 0)
 	for _, theatreConf := range conf.Theatres {
+		//MAJOR ERROR! Can't assume the channel data is ordered the same as the conf!!
 		for _, showtime := range <-ch {
 			entries = append(entries, model.ShowtimeEntry{Theatre: theatreConf.Name, Showtime: showtime})
 		}

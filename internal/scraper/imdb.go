@@ -73,8 +73,6 @@ func (s imdbScraper) Scrape(ch chan<- []model.Showtime, dates []time.Time, tz *t
 		})
 	}
 
-	fmt.Print(showtimes)
-
 	ch <- showtimes
 
 	return nil
