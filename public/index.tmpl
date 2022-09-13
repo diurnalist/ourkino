@@ -9,44 +9,42 @@
 <body>
   <div id="content-wrap">
     <header>
-      <h3 class="page-header"><a data-goto-page="today">Today</a></h3>
-      <h3 class="page-header inactive"><a data-goto-page="tomorrow">Tomorrow</a></h3>
+      {{- $classList := "" -}}
+      {{range $day, $showtimes := .ByTime}}
+      <h3 class="page-header {{ $classList }}"><a data-goto-page="{{ $day }}">{{ $day.Format "Jan 2" }}</a></h3>
+      {{- $classList = "inactive" -}}
+      {{end}}
     </header>
     <div class="filter">
       <input type="text" placeholder="Filter by film/kino"/>
     </div>
-    <div class="page" data-page="today">
-      {{define "showtime"}}
-      <li class="showtime" data-iso-time="{{ .ShowtimeISO }}" data-text-search="{{ .Search }}">
-        <div class="showtime-time">{{ .ShowtimeDisplay }}</div>
-        <div class="showtime-info">
-          <div class="showtime-title">
-            {{if .DeepLink}}<a href="{{ .DeepLink }}" target="_blank">{{end}}{{ .Film }}{{if .DeepLink}}</a>{{end}}
-            {{if .Language}}
-              <span class="showtime-language">{{ .Language }}</span>
-            {{end}}
+    {{- define "showtime" -}}
+        <li class="showtime" data-iso-time="{{ .ShowtimeISO }}" data-text-search="{{ .Search }}">
+          <div class="showtime-time">{{ .ShowtimeDisplay }}</div>
+          <div class="showtime-info">
+            <div class="showtime-title">
+              {{if .DeepLink}}<a href="{{ .DeepLink }}" target="_blank">{{end}}{{ .Film }}{{if .DeepLink}}</a>{{end}}
+              {{- if .Language}}
+                <span class="showtime-language">{{ .Language }}</span>
+              {{end -}}
+            </div>
+            <div class="showtime-location">{{ .Theatre }}</div>
           </div>
-          <div class="showtime-location">{{ .Theatre }}</div>
-        </div>
-      </li>
-      {{end}}
+        </li>
+    {{- end -}}
+    {{- $classList := "" -}}
+    {{range $day, $showtimes := .ByTime}}
+    <div class="page {{ $classList }}" data-page="{{ $day }}">
       <ol class="showtimes">
-      {{range .Today}}
-        {{template "showtime"}}
+      {{range $showtimes}}
+        {{template "showtime" .}}
       {{else}}
         <li class="showtime"><p class="empty">No showtimes today :(</p></li>
       {{end}}
       </ol>
     </div>
-    <div class="page inactive" data-page="tomorrow">
-      <ol class="showtimes">
-      {{range .Tomorrow}}
-        {{template "showtime"}}
-      {{else}}
-        <li class="showtime"><p class="empty">No showtimes tomorrow :(</p></li>
-      {{end}}
-      </ol>
-    </div>
+    {{- $classList = "inactive" -}}
+    {{end}}
   </div>
   <script async src="./js/page.js"></script>
   {{if .GoogleAnalytics}}

@@ -9,6 +9,27 @@
       "driverArgs": {
         "permalink": "ci0015247"
       }
+    },
+    {
+      "name": "Gene Siskel",
+      "driver": "imdb",
+      "driverArgs": {
+        "permalink": "ci0006584"
+      }
+    },
+    {
+      "name": "Logan Theater",
+      "driver": "imdb",
+      "driverArgs": {
+        "permalink": "ci0005986"
+      }
+    },
+    {
+      "name": "Music Box",
+      "driver": "imdb",
+      "driverArgs": {
+        "permalink": "ci91815395"
+      }
     }
   ]
 }
