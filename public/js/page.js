@@ -1,7 +1,7 @@
 (function () {
 
   var doc = window.document;
-  
+
   function onLoad() {
     var showtimeEls = doc.querySelectorAll('.showtime');
     var filterEl = doc.querySelector('.filter > input');
@@ -10,10 +10,7 @@
     // Hide any events in the past
     showtimeEls.forEach(function (el) {
       var localShowtime = new Date(el.dataset.isoTime);
-      localShowtime.setHours(localShowtime.getUTCHours());
-
       var cutoff = new Date();
-      cutoff.setHours(cutoff.getUTCHours());
 
       if (localShowtime < cutoff) {
         el.style.display = 'none';

@@ -1,4 +1,4 @@
 # Default output directory
-dist/
-# NPM modules
-node_modules/
+public/index.html
+# Default config file
+config.json
