@@ -1,6 +1,7 @@
 ---
 archives:
   - files:
-    - public/css/*
-    - public/js/*
-    - public/index.tmpl
+      - example/*
+      - public/css/*
+      - public/js/*
+      - public/index.tmpl
