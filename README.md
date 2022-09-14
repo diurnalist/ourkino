@@ -6,7 +6,7 @@ This listing is biased towards independent cinemas. Particularly in Berlin, ther
 
 **[ourkino.com](https://ourkino.com)**
 
-![screenshot](./screenshot.png)
+![screenshot](./assets/screenshot.png)
 
 The UI displays all upcoming shows in time order, regardless of location. The assumption is that you care more about the when than the where. A filter box enables you to filter by cinema or movie title.
 
