@@ -1,0 +1,6 @@
+---
+archives:
+  - files:
+    - public/css/*
+    - public/js/*
+    - public/index.tmpl
