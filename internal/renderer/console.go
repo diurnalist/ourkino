@@ -14,7 +14,7 @@ func (r ConsoleRenderer) Render(entries []model.ShowtimeEntry) error {
 	t.SetOutputMirror(os.Stdout)
 	t.AppendHeader(table.Row{"Showtime", "Film", "Theatre"})
 	for _, entry := range entries {
-		t.AppendRow([]interface{}{entry.Showtime.Showtime, entry.Film, entry.Theatre})
+		t.AppendRow([]interface{}{entry.Showtime.When, entry.Film, entry.Theatre})
 	}
 	t.Render()
 	return nil

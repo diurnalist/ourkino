@@ -6,7 +6,7 @@ import (
 
 type Showtime struct {
 	Film     string
-	Showtime time.Time
+	When     time.Time
 	Language string
 	DeepLink string
 }

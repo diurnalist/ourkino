@@ -4,6 +4,8 @@ go 1.19
 
 require golang.org/x/net v0.0.0-20210916014120-12bc252f5db8 // indirect
 
+require golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
+
 require github.com/PuerkitoBio/goquery v1.8.0
 
 require (

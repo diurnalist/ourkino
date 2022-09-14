@@ -1,18 +1,19 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
 	"sort"
-	"sync"
 	"time"
 
 	"github.com/diurnalist/ourkino/internal/config"
 	"github.com/diurnalist/ourkino/internal/model"
 	"github.com/diurnalist/ourkino/internal/renderer"
 	"github.com/diurnalist/ourkino/internal/scraper"
+	"golang.org/x/sync/errgroup"
 )
 
 func StartOfDay(t time.Time) time.Time {
@@ -54,23 +55,21 @@ func main() {
 		dayRange = append(dayRange, date)
 	}
 
-	var wg sync.WaitGroup
+	errs, _ := errgroup.WithContext(context.Background())
 	// Pass the set of all showtimes for a given theatre on a channel
 	chanMap := make([]chan []model.Showtime, len(conf.Theatres))
 	for i, theatreConf := range conf.Theatres {
 		ch := make(chan []model.Showtime, 1)
-		wg.Add(1)
 		scraper, err := scraper.Instance(theatreConf.Driver, theatreConf.DriverArgs)
 		check(err)
-		go func() {
-			defer wg.Done()
-			err := scraper.Scrape(ch, dayRange, timeLoc)
-			check(err)
-		}()
+		errs.Go(func() error {
+			return scraper.Scrape(ch, dayRange, timeLoc)
+		})
 		chanMap[i] = ch
 	}
 
-	wg.Wait()
+	err = errs.Wait()
+	check(err)
 
 	entries := make([]model.ShowtimeEntry, 0)
 	for i, theatreConf := range conf.Theatres {
@@ -80,14 +79,14 @@ func main() {
 	}
 
 	sort.Slice(entries, func(i, j int) bool {
-		return entries[i].Showtime.Showtime.Before(entries[j].Showtime.Showtime)
+		return entries[i].Showtime.When.Before(entries[j].Showtime.When)
 	})
 
-	//TODO: use renderers here
 	var r renderer.Renderer
-	if *output == "html" {
+	switch *output {
+	case "html":
 		r = renderer.HtmlRenderer{}
-	} else {
+	default:
 		r = renderer.ConsoleRenderer{}
 	}
 	err = r.Render(entries)

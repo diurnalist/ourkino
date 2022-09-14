@@ -36,7 +36,7 @@ func (r HtmlRenderer) Render(entries []model.ShowtimeEntry) error {
 	buckets := make(map[time.Time][]ShowtimeTemplateVars, 1)
 	bucketTime := time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC)
 	for _, entry := range entries {
-		showtime := entry.Showtime.Showtime
+		showtime := entry.Showtime.When
 		if showtime.Sub(bucketTime) > (time.Hour * 27) {
 			bucketTime = time.Date(showtime.Year(), showtime.Month(), showtime.Day(), 0, 0, 0, 0, showtime.Location())
 			// Start new bucket

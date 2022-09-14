@@ -113,7 +113,7 @@ func (s yorckScraper) Scrape(ch chan<- []model.Showtime, dates []time.Time, tz *
 				}
 
 				showtimes = append(showtimes, model.Showtime{
-					Film: film.Fields.Title, Showtime: showtime,
+					Film: film.Fields.Title, When: showtime,
 					Language: session.Fields.Formats[0], DeepLink: "",
 				})
 			}

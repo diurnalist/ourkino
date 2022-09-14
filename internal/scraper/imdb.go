@@ -68,7 +68,7 @@ func (s imdbScraper) Scrape(ch chan<- []model.Showtime, dates []time.Time, tz *t
 
 			for _, time := range times {
 				showtimes = append(showtimes,
-					model.Showtime{Film: title, Showtime: time, Language: "", DeepLink: deepLink})
+					model.Showtime{Film: title, When: time, Language: "", DeepLink: deepLink})
 			}
 		})
 	}

@@ -1,0 +1,153 @@
+{
+  "name": "Berlin",
+  "timezone": "Europe/Berlin",
+  "theatres": [
+    {
+      "name": "Babylon Mitte",
+      "driver": "kinoheld",
+      "driverArgs": {
+        "id": 670
+      }
+    },
+    {
+      "name": "b-ware! Ladenkino",
+      "driver": "kinoheld",
+      "driverArgs": {
+        "id": 108
+      }
+    },
+    {
+      "name": "Il Kino",
+      "driver": "kinoheld",
+      "driverArgs": {
+        "id": 1563
+      }
+    },
+    {
+      "name": "Intimes",
+      "driver": "kinoheld",
+      "driverArgs": {
+        "id": 2423
+      }
+    },
+    {
+      "name": "FSK Kino",
+      "driver": "kinoheld",
+      "driverArgs": {
+        "id": 590
+      }
+    },
+    {
+      "name": "Hackesche Hoefe",
+      "driver": "kinoheld",
+      "driverArgs": {
+        "id": 614
+      }
+    },
+    {
+      "name": "Kino Central",
+      "driver": "kinoheld",
+      "driverArgs": {
+        "id": 163
+      }
+    },
+    {
+      "name": "Sputnik Kino",
+      "driver": "kinoheld",
+      "driverArgs": {
+        "id": 1166
+      }
+    },
+    {
+      "name": "Tilsiter Lichtspiele",
+      "driver": "kinoheld",
+      "driverArgs": {
+        "id": 1203
+      }
+    },
+    {
+      "name": "Wolf Kino",
+      "driver": "kinoheld",
+      "driverArgs": {
+        "id": 1856
+      }
+    },
+    {
+      "name": "Babylon Kreuzberg",
+      "driver": "yorck",
+      "driverArgs": {
+        "title": "Babylon Kreuzberg"
+      }
+    },
+    {
+      "name": "Cinema Paris",
+      "driver": "yorck",
+      "driverArgs": {
+        "title": "Cinema Paris"
+      }
+    },
+    {
+      "name": "Delphi Lux",
+      "driver": "yorck",
+      "driverArgs": {
+        "title": "Delphi Lux"
+      }
+    },
+    {
+      "name": "Filmtheatre am Friedrichshain",
+      "driver": "yorck",
+      "driverArgs": {
+        "title": "Filmtheatre am Friedrichshain"
+      }
+    },
+    {
+      "name": "Kant Kino",
+      "driver": "yorck",
+      "driverArgs": {
+        "title": "Kant Kino"
+      }
+    },
+    {
+      "name": "Kino International",
+      "driver": "yorck",
+      "driverArgs": {
+        "title": "Kino International"
+      }
+    },
+    {
+      "name": "Neues Off",
+      "driver": "yorck",
+      "driverArgs": {
+        "title": "Neues Off"
+      }
+    },
+    {
+      "name": "Odeon",
+      "driver": "yorck",
+      "driverArgs": {
+        "title": "Odeon"
+      }
+    },
+    {
+      "name": "Passage",
+      "driver": "yorck",
+      "driverArgs": {
+        "title": "Passage"
+      }
+    },
+    {
+      "name": "Rollberg",
+      "driver": "yorck",
+      "driverArgs": {
+        "title": "Rollberg"
+      }
+    },
+    {
+      "name": "Yorck",
+      "driver": "yorck",
+      "driverArgs": {
+        "title": "Yorck"
+      }
+    }
+  ]
+}
