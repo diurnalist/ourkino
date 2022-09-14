@@ -13,16 +13,7 @@ The UI displays all upcoming shows in time order, regardless of location. The as
 ## Building
 
 ```shell
-yarn install && yarn build
-```
-
-## Testing
-
-### Testing a single scraper
-
-```shell
-# Pass in name of scraper as argument
-yarn run test-scraper -- 'gene siskel'
+go build
 ```
 
 ## Acknowledgements
