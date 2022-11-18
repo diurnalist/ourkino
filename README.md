@@ -1,8 +1,8 @@
 # ourkino
 
-A simple movie showtime listing for a highly curated list of locations. Currently supports showtimes for 🇩🇪 **Berlin** and 🇺🇸 **Chicago**, because that is where I have resided.
+A simple movie showtime listing for a highly curated list of locations. Currently supports showtimes for 🇩🇪 **Berlin**, 🇺🇸 **Chicago**, and 🇺🇸 **Seattle**, because that is where I have resided.
 
-This listing is biased towards independent cinemas. Particularly in Berlin, there was no single site that simply listed what films are playing across the subset of kinos that tend to run indie films.
+This listing is biased towards independent cinemas. Particularly in Berlin and Seattle, there was no single site that simply listed what films are playing across the subset of kinos that tend to run indie films.
 
 **[ourkino.com](https://ourkino.com)**
 
@@ -18,4 +18,4 @@ go build
 
 ## Acknowledgements
 
-For the Berlin listings, this relies heavily on the high-quality listing information assembled and presented by [kinoheld](https://www.kinoheld.de/). For the Chicago listings, it uses the showtime feeds from [IMDb](https://www.imdb.com/).
+For the Berlin listings, this relies heavily on the high-quality listing information assembled and presented by [kinoheld](https://www.kinoheld.de/). For the Chicago listings, it uses the showtime feeds from [IMDb](https://www.imdb.com/). For Seattle listings, it uses data from [Elevent](https://getelevent.com) and other bespoke sources.
