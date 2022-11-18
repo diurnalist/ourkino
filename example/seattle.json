@@ -1,0 +1,47 @@
+{
+    "name": "Seattle",
+    "days": 2,
+    "timezone": "America/Los_Angeles",
+    "notes": "TODO: NW Film Forum (bespoke) and Grand Illusion Cinemas (bespoke)",
+    "theatres": [
+        {
+            "name": "SIFF Cinema Uptown",
+            "driver": "elevent",
+            "driverArgs": {
+                "permalink": "SIFF",
+                "venueID": "719"
+            }
+        },
+        {
+            "name": "SIFF Cinema Egyptian",
+            "driver": "elevent",
+            "driverArgs": {
+                "permalink": "SIFF",
+                "venueID": "721"
+            }
+        },
+        {
+            "name": "Central Cinema",
+            "driver": "elevent",
+            "driverArgs": {
+                "permalink": "CentralCinema",
+                "venueID": ""
+            }
+        },
+        {
+            "name": "Admiral Theater",
+            "driver": "faraway",
+            "driverArgs": {
+                "location": "9383456",
+                "url": "https://faraway.intensify-solutions.com/embed?location=9383456"
+            }
+        },
+        {
+            "name": "Varsity Theater",
+            "driver": "faraway",
+            "driverArgs": {
+                "location": "6327218"
+            }
+        }
+    ]
+}
