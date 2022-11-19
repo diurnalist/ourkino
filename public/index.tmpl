@@ -19,11 +19,11 @@
       <input type="text" placeholder="Filter by film/kino"/>
     </div>
     {{- define "showtime" -}}
-        <li class="showtime" data-iso-time="{{ .ShowtimeISO }}" data-text-search="{{ .Search }}">
+        <li class="showtime" data-iso-time="{{ .ShowtimeISO }}" data-text-search="{{ .SearchIndex }}">
           <div class="showtime-time">{{ .ShowtimeDisplay }}</div>
           <div class="showtime-info">
             <div class="showtime-title">
-              {{if .DeepLink}}<a href="{{ .DeepLink }}" target="_blank">{{end}}{{ .Film }}{{if .DeepLink}}</a>{{end}}
+              <a {{ if .DeepLink }}href="{{ .DeepLink }}" target="_blank"{{ end }} data-goto-details="{{ .DetailsIndex }}">{{ .Film }}</a>
               {{- if .Language}}
                 <span class="showtime-language">{{ .Language }}</span>
               {{end -}}
@@ -45,6 +45,18 @@
     </div>
     {{- $classList = "inactive" -}}
     {{end}}
+    {{ range $key, $details := .Details }}
+    <div class="details" data-details="{{ $key }}">
+      <div class="details-wrapper">
+        <div class="details-controls">
+          <button class="close">Close</button>
+        </div>
+        {{ if $details.ImageURL }}<img class="showtime-image" src="{{ $details.ImageURL }}" />{{ end }}
+        <h3 class="showtime-title">{{ $details.Film }}</h3>
+        <div class="showtime-description">{{ $details.Description }}</div>
+      </div>
+    </div>
+    {{ end }}
   </div>
   <script async src="./js/page.js"></script>
   {{if .GoogleAnalytics}}

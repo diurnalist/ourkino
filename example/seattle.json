@@ -9,7 +9,21 @@
             "driver": "elevent",
             "driverArgs": {
                 "permalink": "SIFF",
-                "venueID": "719"
+                "venueIDs": [
+                    "721",
+                    "773",
+                    "774"
+                ]
+            }
+        },
+        {
+            "name": "SIFF Film Center",
+            "driver": "elevent",
+            "driverArgs": {
+                "permalink": "SIFF",
+                "venueIDs": [
+                    "720"
+                ]
             }
         },
         {
@@ -17,7 +31,9 @@
             "driver": "elevent",
             "driverArgs": {
                 "permalink": "SIFF",
-                "venueID": "721"
+                "venueIDs": [
+                    "719"
+                ]
             }
         },
         {
@@ -25,7 +41,9 @@
             "driver": "elevent",
             "driverArgs": {
                 "permalink": "CentralCinema",
-                "venueID": ""
+                "venueIDs": [
+                    "1658"
+                ]
             }
         },
         {

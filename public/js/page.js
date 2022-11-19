@@ -6,6 +6,7 @@
     var showtimeEls = doc.querySelectorAll('.showtime');
     var filterEl = doc.querySelector('.filter > input');
     var gotoPageLinks = doc.querySelectorAll('[data-goto-page]');
+    var gotoDetailsLinks = doc.querySelectorAll('[data-goto-details]');
 
     // Hide any events in the past
     showtimeEls.forEach(function (el) {
@@ -43,6 +44,30 @@
 
         doc.querySelectorAll('[data-page]').forEach(function (pageEl) {
           pageEl.classList.toggle('inactive', pageEl.dataset.page !== gotoPage);
+        });
+      });
+    });
+
+    // Allow toggling details
+    gotoDetailsLinks.forEach(function (linkEl) {
+      var detailsKey = linkEl.dataset.gotoDetails;
+
+      function closer(el) {
+        var handler = function (event) {
+          el.classList.toggle('active', false);
+          el.removeEventListener('click', handler);
+          event.preventDefault();
+        }
+        return handler;
+      }
+
+      linkEl.addEventListener('click', function (event) {
+        doc.querySelectorAll('[data-details]').forEach(function (detailsEl) {
+          var isActive = detailsEl.dataset.details === detailsKey;
+          detailsEl.classList.toggle('active', isActive);
+          if (isActive) {
+            detailsEl.addEventListener('click', closer(detailsEl));
+          }
         });
       });
     });
