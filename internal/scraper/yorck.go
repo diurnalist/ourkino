@@ -99,16 +99,7 @@ func (s yorckScraper) Scrape(ch chan<- []model.Showtime, dates []time.Time, tz *
 					return err
 				}
 
-				// TODO: shared with kinoheld, possibly make a helper.
-				dateInRange := false
-				for _, date := range dates {
-					date = date.In(tz)
-					if showtime.Year() == date.Year() && showtime.Month() == date.Month() && showtime.Day() == date.Day() {
-						dateInRange = true
-						break
-					}
-				}
-				if !dateInRange {
+				if !DateInRange(showtime, dates) {
 					continue
 				}
 

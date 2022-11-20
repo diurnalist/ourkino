@@ -50,8 +50,7 @@
             "name": "Admiral Theater",
             "driver": "faraway",
             "driverArgs": {
-                "location": "9383456",
-                "url": "https://faraway.intensify-solutions.com/embed?location=9383456"
+                "location": "9383456"
             }
         },
         {

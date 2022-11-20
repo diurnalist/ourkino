@@ -64,28 +64,21 @@ func (s eleventScraper) Scrape(ch chan<- []model.Showtime, dates []time.Time, tz
 						}
 					}
 
-					when, err := time.Parse("2006-01-02T15:04:05", showtime.StartDateTime)
-					localizedWhen := time.Date(when.Year(), when.Month(), when.Day(), when.Hour(), when.Minute(), 0, 0, tz)
+					startDateTime, err := time.Parse("2006-01-02T15:04:05", showtime.StartDateTime)
+					showtime := time.Date(
+						startDateTime.Year(), startDateTime.Month(), startDateTime.Day(),
+						startDateTime.Hour(), startDateTime.Minute(), 0, 0, tz)
 					if err != nil {
 						fmt.Print(err)
 						continue
 					}
 
-					// TODO: shared with kinoheld, possibly make a helper.
-					dateInRange := false
-					for _, date := range dates {
-						date = date.In(tz)
-						if localizedWhen.Year() == date.Year() && localizedWhen.Month() == date.Month() && localizedWhen.Day() == date.Day() {
-							dateInRange = true
-							break
-						}
-					}
-					if !dateInRange {
+					if !DateInRange(showtime, dates) {
 						continue
 					}
 
 					showtimes = append(showtimes, model.Showtime{
-						Film: event.EventName, When: localizedWhen, Language: "", DeepLink: "",
+						Film: event.EventName, When: showtime, Language: "", DeepLink: "",
 						Details: model.ShowtimeDetails{
 							Description: event.Synopsis,
 							ImageURL:    event.EventImageURL,
