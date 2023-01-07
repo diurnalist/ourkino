@@ -48,7 +48,7 @@ func main() {
 		conf.Days = *days
 	}
 
-	date, dayRange := StartOfDay(time.Now()), make([]time.Time, 1)
+	date, dayRange := StartOfDay(time.Now().In(timeLoc)), make([]time.Time, 1)
 	dayRange[0] = date
 	for i := 1; i < conf.Days; i++ {
 		date = date.Add(time.Hour * 24)
