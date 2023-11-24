@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"slices"
+	"strconv"
 	"strings"
 	"time"
 
@@ -58,10 +60,8 @@ func (s eleventScraper) Scrape(ch chan<- []model.Showtime, dates []time.Time, tz
 
 			for _, event := range eventList.Events {
 				for _, showtime := range event.Schedule {
-					for venueID := range venueIds {
-						if showtime.VenueID != venueID {
-							break
-						}
+					if !slices.Contains(venueIds, strconv.FormatInt(int64(showtime.VenueID), 10)) {
+						continue
 					}
 
 					startDateTime, err := time.Parse("2006-01-02T15:04:05", showtime.StartDateTime)
@@ -78,11 +78,15 @@ func (s eleventScraper) Scrape(ch chan<- []model.Showtime, dates []time.Time, tz
 					}
 
 					showtimes = append(showtimes, model.Showtime{
-						Film: event.EventName, When: showtime, Language: "", DeepLink: "",
+						Film:     event.EventName,
+						When:     showtime,
+						Language: "",
+						DeepLink: "",
 						Details: model.ShowtimeDetails{
 							Description: event.Synopsis,
 							ImageURL:    event.EventImageURL,
-						}})
+						},
+					})
 				}
 			}
 		}
