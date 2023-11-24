@@ -1,6 +1,6 @@
 module github.com/diurnalist/ourkino
 
-go 1.19
+go 1.21
 
 require golang.org/x/net v0.0.0-20210916014120-12bc252f5db8 // indirect
 
