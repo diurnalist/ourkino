@@ -1,6 +1,8 @@
 ---
 builds:
-  - goarch:
+  - env:
+      - CGO_ENABLED=1
+    goarch:
       - amd64
       # supporting arm is possible if we get CGO support
       # working in the github action/goreleaser pipeline.
