@@ -2,7 +2,9 @@
 builds:
   - goarch:
       - amd64
-      - arm64
+      # supporting arm is possible if we get CGO support
+      # working in the github action/goreleaser pipeline.
+      # - arm64
 archives:
   - files:
       - example/*
