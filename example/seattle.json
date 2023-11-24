@@ -50,14 +50,14 @@
             "name": "Admiral Theater",
             "driver": "faraway",
             "driverArgs": {
-                "location": "9383456"
+                "permalink": "historic-admiral"
             }
         },
         {
             "name": "Varsity Theater",
             "driver": "faraway",
             "driverArgs": {
-                "location": "6327218"
+                "permalink": "varsity-theatre"
             }
         }
     ]

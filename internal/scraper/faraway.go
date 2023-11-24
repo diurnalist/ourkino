@@ -4,15 +4,30 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/diurnalist/ourkino/internal/model"
+	v8 "rogchap.com/v8go"
 )
 
 type farawayScraper struct {
-	Location string
+	Permalink string
+}
+
+type FarawayMovieData = map[string][]FarawayListing
+
+type FarawayListing struct {
+	Url           string         `json:"url"`
+	ImagePortrait string         `json:"image-portrait"`
+	Title         string         `json:"title"`
+	Times         []FarawayEvent `json:"times"`
+}
+
+type FarawayEvent struct {
+	Time        string `json:"time"`
+	BookingLink string `json:"bookingLink"`
 }
 
 type FarawayRepertoireEvent struct {
@@ -37,43 +52,67 @@ type FarawayRepertoireWrapper struct {
 func (s farawayScraper) Scrape(ch chan<- []model.Showtime, dates []time.Time, tz *time.Location) error {
 	showtimes := make([]model.Showtime, 0)
 
-	for _, date := range dates {
-		reqUrl := "https://faraway.intensify-solutions.com/embed/ajaxGetRepertoire"
-		data := url.Values{}
-		data.Set("location", s.Location)
-		data.Set("date", date.Format("2006-01-02"))
-		res, err := http.Post(reqUrl, "application/x-www-form-urlencoded", strings.NewReader(data.Encode()))
-		if err != nil {
-			return err
+	v8ctx := v8.NewContext()
+
+	url := fmt.Sprintf("https://www.farawayentertainment.com/%s", s.Permalink)
+	res, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+
+	defer res.Body.Close()
+	doc, err := goquery.NewDocumentFromReader(res.Body)
+	if err != nil {
+		return err
+	}
+
+	movieData := make(FarawayMovieData)
+	var jsErr error
+	doc.Find("script").EachWithBreak(func(i int, s *goquery.Selection) bool {
+		if !strings.Contains(s.Text(), "movieData") {
+			return true
 		}
 
-		var repertoire FarawayRepertoireWrapper
-		defer res.Body.Close()
-		json.NewDecoder(res.Body).Decode(&repertoire)
+		if _, jsErr := v8ctx.RunScript(s.Text(), "scrape.js"); jsErr != nil {
+			return false
+		}
 
-		for _, rData := range repertoire.Data {
-			if len(rData.EventGroup) != 1 {
-				//Some entries have 0-length event groups; these can be ignored.
-				continue
-			}
+		val, jsErr := v8ctx.RunScript("movieData", "scrape.js")
+		if jsErr != nil {
+			return false
+		}
 
-			for _, event := range rData.EventGroup[0].EventsCollection {
-				timetableDate, err := time.Parse("2006-01-02 15:04", event.EventTimetable)
+		valJson, jsErr := v8.JSONStringify(v8ctx, val)
+		if jsErr != nil {
+			return false
+		}
+
+		json.Unmarshal([]byte(valJson), &movieData)
+
+		return false
+	})
+	if jsErr != nil {
+		fmt.Println(jsErr)
+		return jsErr
+	}
+
+	for _, d := range dates {
+		key := d.Format("2006-01-02")
+		for _, movie := range movieData[key] {
+			for _, movietime := range movie.Times {
+				showtimeTime, err := time.Parse("3:04pm", movietime.Time)
 				if err != nil {
-					return err
+					fmt.Println(err)
+					continue
 				}
-				showtime := time.Date(
-					timetableDate.Year(), timetableDate.Month(), timetableDate.Day(),
-					timetableDate.Hour(), timetableDate.Minute(), 0, 0, tz)
-
+				showtime := time.Date(d.Year(), d.Month(), d.Day(), showtimeTime.Hour(), showtimeTime.Minute(), 0, 0, tz)
 				showtimes = append(showtimes, model.Showtime{
-					Film:     rData.Title,
+					Film:     movie.Title,
 					When:     showtime,
-					Language: "",
 					DeepLink: "",
 					Details: model.ShowtimeDetails{
-						Description: rData.Description,
-						ImageURL:    "https://faraway.intensify-solutions.com" + rData.Picture1,
+						Description: "",
+						ImageURL:    movie.ImagePortrait,
 					},
 				})
 			}
@@ -87,11 +126,11 @@ func (s farawayScraper) Scrape(ch chan<- []model.Showtime, dates []time.Time, tz
 
 func init() {
 	Register("faraway", func(args map[string]any) (Scraper, error) {
-		location, ok := args["location"].(string)
+		permalink, ok := args["permalink"].(string)
 		if !ok {
-			return nil, fmt.Errorf("missing required param: %v", "location")
+			return nil, fmt.Errorf("missing required param: %v", "permalink")
 		}
 
-		return &farawayScraper{location}, nil
+		return &farawayScraper{permalink}, nil
 	})
 }

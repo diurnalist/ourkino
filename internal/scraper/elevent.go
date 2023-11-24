@@ -69,7 +69,7 @@ func (s eleventScraper) Scrape(ch chan<- []model.Showtime, dates []time.Time, tz
 						startDateTime.Year(), startDateTime.Month(), startDateTime.Day(),
 						startDateTime.Hour(), startDateTime.Minute(), 0, 0, tz)
 					if err != nil {
-						fmt.Print(err)
+						fmt.Println(err)
 						continue
 					}
 

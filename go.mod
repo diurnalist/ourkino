@@ -15,4 +15,7 @@ require (
 	golang.org/x/sys v0.0.0-20210423082822-04245dca01da // indirect
 )
 
-require github.com/jedib0t/go-pretty/v6 v6.3.8
+require (
+	github.com/jedib0t/go-pretty/v6 v6.3.8
+	rogchap.com/v8go v0.9.0
+)
