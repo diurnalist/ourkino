@@ -2,6 +2,8 @@
 builds:
   - env:
       - CGO_ENABLED=1
+    goos:
+      - linux
     goarch:
       - amd64
       # supporting arm is possible if we get CGO support
