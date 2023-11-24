@@ -17,5 +17,5 @@ require (
 
 require (
 	github.com/jedib0t/go-pretty/v6 v6.3.8
-	rogchap.com/v8go v0.9.0
+	rogchap.com/v8go v0.8.0
 )
