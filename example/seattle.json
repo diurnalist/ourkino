@@ -6,14 +6,9 @@
     "theatres": [
         {
             "name": "SIFF Cinema Uptown",
-            "driver": "elevent",
+            "driver": "siff",
             "driverArgs": {
-                "permalink": "SIFF",
-                "venueIDs": [
-                    "721",
-                    "773",
-                    "774"
-                ]
+                "permalink": "siff-cinema-uptown"
             }
         },
         {
@@ -27,13 +22,17 @@
             }
         },
         {
-            "name": "SIFF Cinema Egyptian",
-            "driver": "elevent",
+            "name": "SIFF Cinema Downtown",
+            "driver": "siff",
             "driverArgs": {
-                "permalink": "SIFF",
-                "venueIDs": [
-                    "719"
-                ]
+                "permalink": "siff-cinema-downtown"
+            }
+        },
+        {
+            "name": "SIFF Cinema Egyptian",
+            "driver": "siff",
+            "driverArgs": {
+                "permalink": "siff-cinema-egyptian"
             }
         },
         {
