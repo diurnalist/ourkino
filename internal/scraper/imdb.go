@@ -1,32 +1,59 @@
 package scraper
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
-	"regexp"
-	"strings"
 	"time"
-	"unicode"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/diurnalist/ourkino/internal/model"
 )
 
-const baseUrl = "https://imdb.com"
+const imdbBaseUrl = "https://imdb.com"
+const imdbUserAgent = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Mobile Safari/537.36"
 
 type imdbScraper struct {
 	Permalink string
+}
+
+type imdbMovieTheater struct {
+	Events []imdbEvent `json:"event"`
+}
+
+type imdbEvent struct {
+	StartDate     string            `json:"startDate"`
+	WorkPresented imdbWorkPresented `json:"workPresented"`
+}
+
+type imdbWorkPresented struct {
+	Name  string `json:"name"`
+	URL   string `json:"url"`
+	Image string `json:"image"`
 }
 
 func (s imdbScraper) Scrape(ch chan<- []model.Showtime, dates []time.Time, tz *time.Location) error {
 	showtimes := make([]model.Showtime, 0)
 
 	for _, d := range dates {
-		path := fmt.Sprintf("/showtimes/cinema/US/%v/%v", s.Permalink, d.Format("2006-01-02"))
-		// TODO: more idiomatic way?
-		res, err := http.Get(baseUrl + path)
+		path := fmt.Sprintf("/showtimes/cinema/US/%v/US/60622/%v", s.Permalink, d.Format("2006-01-02"))
+
+		req, err := http.NewRequest(http.MethodGet, imdbBaseUrl+path, nil)
 		if err != nil {
 			return err
+		}
+
+		headers := http.Header{}
+		headers.Add("user-agent", imdbUserAgent)
+		req.Header = headers
+
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return err
+		}
+		if res.StatusCode != 200 {
+			return fmt.Errorf("http error %d", res.StatusCode)
 		}
 
 		defer res.Body.Close()
@@ -35,42 +62,37 @@ func (s imdbScraper) Scrape(ch chan<- []model.Showtime, dates []time.Time, tz *t
 			return err
 		}
 
-		re := regexp.MustCompile(`.*/title/(tt[0-9]+).*`)
-
-		// Find the review items
-		doc.Find(".article.st [itemtype='http://schema.org/Movie']").Each(func(i int, s *goquery.Selection) {
-			title := strings.TrimSpace(s.Find("[itemprop=name]").Text())
-			deepLink, _ := s.Find("[itemprop=url]").Attr("href")
-			match := re.FindStringSubmatch(deepLink)
-			if match != nil {
-				deepLink = fmt.Sprintf("%v/title/%v", baseUrl, match[1])
-			} else if len(deepLink) > 0 {
-				deepLink = baseUrl + deepLink
+		var errs []error
+		doc.Find("script[type='application/ld+json']").Each(func(i int, s *goquery.Selection) {
+			var theater imdbMovieTheater
+			err := json.Unmarshal([]byte(s.Text()), &theater)
+			if err != nil {
+				errs = append(errs, err)
+				return
 			}
 
-			rawShowtimes := strings.Fields(strings.ToLower(s.Find(".showtimes").Text()))
-			ampm := "am"
-			times := make([]time.Time, 0)
-			for _, token := range rawShowtimes {
-				runeSeq := []rune(token)
-				switch {
-				case token == "pm":
-					ampm = "pm"
-					// Reprocess the last one to be PM instead of AM
-					times[len(times)-1] = times[len(times)-1].Add(time.Hour * 12)
-				case unicode.IsDigit(runeSeq[0]):
-					showtime, _ := time.Parse("3:04pm", token+ampm)
-					// TODO: handle error properly here (early quit?)
-					times = append(times,
-						time.Date(d.Year(), d.Month(), d.Day(), showtime.Hour(), showtime.Minute(), 0, 0, tz))
+			for _, event := range theater.Events {
+				d, err := time.Parse("2006-01-02T15:04", event.StartDate)
+				if err != nil {
+					errs = append(errs, err)
+					continue
 				}
-			}
 
-			for _, time := range times {
 				showtimes = append(showtimes,
-					model.Showtime{Film: title, When: time, Language: "", DeepLink: deepLink})
+					model.Showtime{
+						Film:     event.WorkPresented.Name,
+						When:     time.Date(d.Year(), d.Month(), d.Day(), d.Hour(), d.Minute(), 0, 0, tz),
+						Language: "",
+						DeepLink: event.WorkPresented.URL,
+						Details: model.ShowtimeDetails{
+							ImageURL: event.WorkPresented.Image,
+						},
+					})
 			}
 		})
+		if len(errs) > 0 {
+			return errors.Join(errs...)
+		}
 	}
 
 	ch <- showtimes
