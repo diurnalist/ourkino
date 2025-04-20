@@ -1,6 +1,6 @@
 module github.com/diurnalist/ourkino
 
-go 1.21
+go 1.24
 
 require (
 	github.com/andybalholm/cascadia v1.3.1 // indirect
