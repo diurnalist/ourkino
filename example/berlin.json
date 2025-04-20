@@ -1,5 +1,6 @@
 {
   "name": "Berlin",
+  "days": 4,
   "timezone": "Europe/Berlin",
   "theatres": [
     {
