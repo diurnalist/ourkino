@@ -14,5 +14,4 @@ require (
 	github.com/PuerkitoBio/goquery v1.10.3
 	github.com/jedib0t/go-pretty/v6 v6.3.8
 	golang.org/x/sync v0.13.0
-	rogchap.com/v8go v0.9.0
 )

@@ -47,16 +47,16 @@
         },
         {
             "name": "Admiral Theater",
-            "driver": "faraway",
+            "driver": "imdb",
             "driverArgs": {
-                "permalink": "historic-admiral"
+                "permalink": "ci0005455"
             }
         },
         {
             "name": "Varsity Theater",
-            "driver": "faraway",
+            "driver": "imdb",
             "driverArgs": {
-                "permalink": "varsity-theatre"
+                "permalink": "ci0001943"
             }
         }
     ]
