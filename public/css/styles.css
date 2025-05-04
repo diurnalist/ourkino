@@ -102,14 +102,20 @@ header {
 }
 
 .details {
-  background: #343d46;
+  background: rgba(20, 24, 28, 0.92);
   display: none;
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  display: none;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  height: auto;
+  padding: 2rem;
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
 }
 
 .details.active {
@@ -120,18 +126,39 @@ header {
   display: flex;
   flex-direction: column;
   max-width: 96rem;
+  max-height: 90vh;
   margin: 0 auto;
-  overflow-y: scroll;
+  overflow-y: auto;
+  background: #343d46;
+  border-radius: 1rem;
+  padding: 3.5rem 2rem 3.5rem 2rem;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
 }
 
 .details-controls {
-  padding: 2rem 0;
-  text-align: right;
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  z-index: 1;
 }
 
 .details-controls button {
-  /* Disable for now; it is only a visual cue and may not be needed at all */
-  display: none;
+  display: block;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 50%;
+  background: #2e8ab1;
+  color: #d3e3ea;
+  border: none;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.details-controls button:hover {
+  background: #1f6b8a;
 }
 
 .showtime-description {
@@ -140,8 +167,10 @@ header {
   color: #2e8ab1;
 }
 
-.details .showtime-title {
-  margin-top: 2rem;
+.details-text .showtime-title {
+  margin-top: 2.5rem;
+  font-size: 3.2rem;
+  color: #93cce4;
 }
 
 .details .showtime-image {
@@ -166,8 +195,11 @@ header {
 }
 
 .tmdb-attribution {
-  margin-top: 1rem;
+  margin-top: auto;
   text-align: right;
+  position: absolute;
+  right: 2rem;
+  bottom: 2rem;
 }
 
 .tmdb-attribution img {
@@ -178,4 +210,115 @@ header {
 
 .tmdb-attribution img:hover {
   opacity: 1;
+}
+
+.details-main {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.details-poster-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 18rem;
+  max-width: 40vw;
+}
+
+.showtime-image {
+  width: 18rem;
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+}
+
+.details-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.details-text .showtime-description {
+  font-size: 1.7rem;
+  color: #2e8ab1;
+  margin: 1.2rem 0 0 0;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.tmdb-attribution {
+  margin-top: auto;
+  text-align: right;
+  position: absolute;
+  right: 2rem;
+  bottom: 2rem;
+}
+
+.tmdb-attribution a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #8fa7ad;
+  font-size: 1.3rem;
+  text-decoration: none;
+}
+
+.tmdb-powered {
+  color: #8fa7ad;
+  font-size: 1.3rem;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+}
+
+.tmdb-attribution img {
+  height: 20px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.tmdb-attribution img:hover {
+  opacity: 1;
+}
+
+@media (max-width: 600px) {
+  .details-main {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .details-poster-col {
+    max-width: 100%;
+    min-width: 0;
+    align-items: stretch;
+  }
+
+  .showtime-image {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  .ticket-button {
+    width: 100%;
+  }
+
+  .details-text .showtime-title {
+    font-size: 2.4rem;
+  }
+
+  .details-text .showtime-description {
+    font-size: 1.5rem;
+  }
+}
+
+.ticket-button {
+  display: block;
+  width: 100%;
+  margin: 1.5rem 0 0 0;
+  font-size: 2.2rem;
 }
