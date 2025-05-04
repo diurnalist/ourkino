@@ -52,10 +52,12 @@
     gotoDetailsLinks.forEach(function (linkEl) {
       var detailsKey = linkEl.dataset.gotoDetails;
 
-      function closer(el) {
+      function closer(detailsEl, handlingElems) {
         var handler = function (event) {
-          el.classList.toggle('active', false);
-          el.removeEventListener('click', handler);
+          detailsEl.classList.toggle('active', false);
+          handlingElems.forEach(function (el) {
+            el.removeEventListener('click', handler);
+          });
           event.preventDefault();
         }
         return handler;
@@ -63,12 +65,22 @@
 
       linkEl.addEventListener('click', function (event) {
         doc.querySelectorAll('[data-details]').forEach(function (detailsEl) {
+          var closeButton = detailsEl.querySelector('.close');
           var isActive = detailsEl.dataset.details === detailsKey;
           detailsEl.classList.toggle('active', isActive);
           if (isActive) {
-            detailsEl.addEventListener('click', closer(detailsEl));
+            var onClick = closer(detailsEl, [detailsEl, closeButton]);
+            detailsEl.addEventListener('click', onClick);
+            closeButton.addEventListener('click', onClick);
           }
         });
+      });
+    });
+
+    // Prevent modal close when clicking inside the modal content
+    doc.querySelectorAll('.details-wrapper').forEach(function (wrapper) {
+      wrapper.addEventListener('click', function (event) {
+        event.stopPropagation();
       });
     });
   }

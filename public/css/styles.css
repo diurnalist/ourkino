@@ -103,7 +103,6 @@ header {
 
 .details {
   background: rgba(20, 24, 28, 0.92);
-  display: none;
   position: fixed;
   top: 0;
   left: 0;
@@ -116,10 +115,15 @@ header {
   align-items: center;
   justify-content: center;
   overflow-x: hidden;
+  opacity: 0;
+  transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  display: flex;
 }
 
 .details.active {
-  display: flex;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .details-wrapper {
@@ -134,6 +138,12 @@ header {
   padding: 3.5rem 2rem 3.5rem 2rem;
   position: relative;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  transform: translateY(-3rem);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.details.active .details-wrapper {
+  transform: translateY(0);
 }
 
 .details-controls {
@@ -147,14 +157,20 @@ header {
   display: block;
   width: 3.2rem;
   height: 3.2rem;
-  border-radius: 50%;
-  background: #2e8ab1;
-  color: #d3e3ea;
+  background-color: transparent;
   border: none;
-  font-size: 2rem;
-  line-height: 1;
   cursor: pointer;
-  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.details-controls button .close-icon {
+  width: 1.6rem;
+  height: 1.6rem;
+  display: block;
+  filter: invert(1);
 }
 
 .details-controls button:hover {
