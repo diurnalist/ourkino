@@ -6,20 +6,12 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"sort"
 	"time"
 
 	"github.com/diurnalist/ourkino/internal/config"
-	"github.com/diurnalist/ourkino/internal/model"
 	"github.com/diurnalist/ourkino/internal/renderer"
 	"github.com/diurnalist/ourkino/internal/scraper"
-	"golang.org/x/sync/errgroup"
 )
-
-func StartOfDay(t time.Time) time.Time {
-	year, month, day := t.Date()
-	return time.Date(year, month, day, 0, 0, 0, 0, t.Location())
-}
 
 func main() {
 	var err error
@@ -48,40 +40,12 @@ func main() {
 		conf.Days = *days
 	}
 
-	date, dayRange := StartOfDay(time.Now().In(timeLoc)), make([]time.Time, 1)
-	dayRange[0] = date
-	for i := 1; i < conf.Days; i++ {
-		date = date.Add(time.Hour * 24)
-		dayRange = append(dayRange, date)
-	}
-
-	errs, _ := errgroup.WithContext(context.Background())
-	// Pass the set of all showtimes for a given theatre on a channel
-	chanMap := make([]chan []model.Showtime, len(conf.Theatres))
-	for i, theatreConf := range conf.Theatres {
-		ch := make(chan []model.Showtime, 1)
-		scraper, err := scraper.Instance(theatreConf.Driver, theatreConf.DriverArgs)
-		check(err)
-		errs.Go(func() error {
-			return scraper.Scrape(ch, dayRange, timeLoc)
-		})
-		chanMap[i] = ch
-	}
-
-	err = errs.Wait()
+	// Create and execute the scraping job
+	job := scraper.NewJob(conf.Theatres, conf.Days, timeLoc)
+	entries, err := job.Execute(context.Background())
 	check(err)
 
-	entries := make([]model.ShowtimeEntry, 0)
-	for i, theatreConf := range conf.Theatres {
-		for _, showtime := range <-chanMap[i] {
-			entries = append(entries, model.ShowtimeEntry{Theatre: theatreConf.Name, Showtime: showtime})
-		}
-	}
-
-	sort.Slice(entries, func(i, j int) bool {
-		return entries[i].Showtime.When.Before(entries[j].Showtime.When)
-	})
-
+	// Render the results
 	var r renderer.Renderer
 	switch *output {
 	case "html":
