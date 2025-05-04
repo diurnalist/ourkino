@@ -4,11 +4,13 @@ import (
 	"context"
 	"os"
 	"strings"
+	"sync"
 	"text/template"
 	"time"
 
 	"github.com/diurnalist/ourkino/internal/model"
 	"github.com/diurnalist/ourkino/internal/tmdb"
+	"golang.org/x/sync/errgroup"
 )
 
 // HtmlRenderer renders showtimes as an HTML page with movie metadata
@@ -36,10 +38,13 @@ type ShowtimeTemplateVars struct {
 }
 
 type MovieMetadata struct {
-	Title       string
-	Overview    string
-	PosterPath  string
-	ReleaseDate string
+	Title            string
+	Overview         string
+	PosterPath       string
+	ReleaseDate      string
+	Runtime          int
+	OriginalLanguage string
+	Credits          tmdb.MovieCredits
 }
 
 // MovieKey represents a unique movie by its title and release year
@@ -65,6 +70,8 @@ type TemplateVars struct {
 func (r *HtmlRenderer) preprocess(ctx context.Context, entries []model.ShowtimeEntry) (map[MovieKey]*MovieMetadata, error) {
 	// First, build a map of unique movies
 	movies := make(map[MovieKey]*MovieMetadata)
+	var moviesMutex sync.Mutex // Protect concurrent map access
+
 	for _, entry := range entries {
 		// TODO: In the future, we could extract release year from the movie title or other sources
 		key := MovieKey{
@@ -74,24 +81,48 @@ func (r *HtmlRenderer) preprocess(ctx context.Context, entries []model.ShowtimeE
 		movies[key] = nil // Initialize with nil metadata
 	}
 
-	// Now fetch metadata for each unique movie
-	for key := range movies {
-		// TODO: In the future, we could use the release year to improve search accuracy
-		results, err := r.tmdb.SearchMovies(ctx, key.Title, tmdb.SearchOptions{})
-		if err != nil {
-			return nil, err
-		}
+	// Create an errgroup for parallel processing
+	g, ctx := errgroup.WithContext(ctx)
 
-		// For now, just take the first result if we have one
-		if len(results) > 0 {
-			movie := results[0]
-			movies[key] = &MovieMetadata{
-				Title:       movie.Title,
-				Overview:    movie.Overview,
-				PosterPath:  movie.PosterPath,
-				ReleaseDate: movie.ReleaseDate,
+	// Now fetch metadata for each unique movie in parallel
+	for key := range movies {
+		key := key // Create new variable for goroutine
+		g.Go(func() error {
+			// First search for the movie
+			results, err := r.tmdb.SearchMovies(ctx, key.Title, tmdb.SearchOptions{})
+			if err != nil {
+				return err
 			}
-		}
+
+			// If we have results, get the full details of the most popular one
+			if len(results) > 0 {
+				movie, err := r.tmdb.GetMovie(ctx, results[0].ID)
+				if err != nil {
+					return err
+				}
+
+				metadata := &MovieMetadata{
+					Title:            movie.Title,
+					Overview:         movie.Overview,
+					PosterPath:       movie.PosterPath,
+					ReleaseDate:      movie.ReleaseDate,
+					Runtime:          movie.Runtime,
+					OriginalLanguage: movie.OriginalLanguage,
+				}
+
+				// Safely update the map
+				moviesMutex.Lock()
+				movies[key] = metadata
+				moviesMutex.Unlock()
+			}
+
+			return nil
+		})
+	}
+
+	// Wait for all goroutines to complete and check for errors
+	if err := g.Wait(); err != nil {
+		return nil, err
 	}
 
 	return movies, nil

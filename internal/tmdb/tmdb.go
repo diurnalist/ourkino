@@ -6,11 +6,38 @@ import (
 
 // Movie represents a movie from The Movie Database
 type Movie struct {
-	ID          int    `json:"id"`
-	Title       string `json:"title"`
-	Overview    string `json:"overview"`
-	PosterPath  string `json:"poster_path"`
-	ReleaseDate string `json:"release_date"`
+	ID          int     `json:"id"`
+	Title       string  `json:"title"`
+	Overview    string  `json:"overview"`
+	PosterPath  string  `json:"poster_path"`
+	ReleaseDate string  `json:"release_date"`
+	Popularity  float64 `json:"popularity"`
+}
+
+// MovieDetails represents a movie's detailed representation from The Movie Database
+type MovieDetails struct {
+	ID               int    `json:"id"`
+	Title            string `json:"title"`
+	Overview         string `json:"overview"`
+	PosterPath       string `json:"poster_path"`
+	ReleaseDate      string `json:"release_date"`
+	Runtime          int    `json:"runtime"`
+	OriginalLanguage string `json:"original_language"`
+}
+
+// MovieCredits represents a movie's credits from The Movie Database
+type MovieCredits struct {
+	Cast []struct {
+		ID        int    `json:"id"`
+		Name      string `json:"name"`
+		Character string `json:"character"`
+	} `json:"cast"`
+	Crew []struct {
+		ID         int    `json:"id"`
+		Name       string `json:"name"`
+		Job        string `json:"job"`
+		Department string `json:"department"`
+	} `json:"crew"`
 }
 
 // SearchOptions contains optional parameters for movie search
@@ -29,13 +56,8 @@ type SearchResult struct {
 // TMDB defines the interface for interacting with The Movie Database API
 type TMDB interface {
 	// GetMovie retrieves a movie by its ID
-	GetMovie(ctx context.Context, id int) (Movie, error)
+	GetMovie(ctx context.Context, id int) (MovieDetails, error)
 
 	// SearchMovies searches for movies by query string with optional filters
 	SearchMovies(ctx context.Context, query string, opts SearchOptions) ([]Movie, error)
-
-	// FindMovieByTitleAndYear attempts to find a movie by its title and release year.
-	// Returns the best match if found, or an empty result if no good match is found.
-	// The score field indicates confidence in the match (0-1).
-	FindMovieByTitleAndYear(ctx context.Context, title string, year int) (SearchResult, error)
 }

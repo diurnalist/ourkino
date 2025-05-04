@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/url"
 	"sort"
-	"strings"
 	"time"
 )
 
@@ -34,16 +33,16 @@ func NewTMDBClient(apiKey string) *TMDBClient {
 }
 
 // GetMovie retrieves a movie by its ID
-func (c *TMDBClient) GetMovie(ctx context.Context, id int) (Movie, error) {
+func (c *TMDBClient) GetMovie(ctx context.Context, id int) (MovieDetails, error) {
 	path := fmt.Sprintf("/movie/%d", id)
 	req, err := c.newRequest(ctx, path, nil)
 	if err != nil {
-		return Movie{}, fmt.Errorf("creating request: %w", err)
+		return MovieDetails{}, fmt.Errorf("creating request: %w", err)
 	}
 
-	var movie Movie
+	var movie MovieDetails
 	if err := c.do(req, &movie); err != nil {
-		return Movie{}, fmt.Errorf("getting movie: %w", err)
+		return MovieDetails{}, fmt.Errorf("getting movie: %w", err)
 	}
 
 	return movie, nil
@@ -70,51 +69,12 @@ func (c *TMDBClient) SearchMovies(ctx context.Context, query string, opts Search
 		return nil, fmt.Errorf("searching movies: %w", err)
 	}
 
-	// Sort results by release date in descending order
+	// Sort results by popularity (highest first)
 	sort.Slice(response.Results, func(i, j int) bool {
-		// Handle empty release dates by putting them at the end
-		if response.Results[i].ReleaseDate == "" {
-			return false
-		}
-		if response.Results[j].ReleaseDate == "" {
-			return true
-		}
-		// Date formats follow ISO YYYY-MM-DD, so string comparison just works.
-		return response.Results[i].ReleaseDate > response.Results[j].ReleaseDate
+		return response.Results[i].Popularity > response.Results[j].Popularity
 	})
 
 	return response.Results, nil
-}
-
-// FindMovieByTitleAndYear attempts to find a movie by its title and release year
-func (c *TMDBClient) FindMovieByTitleAndYear(ctx context.Context, title string, year int) (SearchResult, error) {
-	// Search for movies with the given title and year
-	movies, err := c.SearchMovies(ctx, title, SearchOptions{ReleaseYear: year})
-	if err != nil {
-		return SearchResult{}, fmt.Errorf("searching movies: %w", err)
-	}
-
-	if len(movies) == 0 {
-		return SearchResult{}, nil
-	}
-
-	// If we have exact matches, return the first one with high confidence
-	for _, movie := range movies {
-		if strings.EqualFold(movie.Title, title) {
-			return SearchResult{
-				Movie: movie,
-				Score: 1.0,
-			}, nil
-		}
-	}
-
-	// If we have partial matches, return the first one with medium confidence
-	// This is a simple heuristic - we could make this more sophisticated
-	// by using string similarity algorithms or considering other factors
-	return SearchResult{
-		Movie: movies[0],
-		Score: 0.7,
-	}, nil
 }
 
 // newRequest creates a new HTTP request with the proper headers
@@ -153,3 +113,5 @@ func (c *TMDBClient) do(req *http.Request, v interface{}) error {
 
 	return nil
 }
+
+var _ TMDB = &TMDBClient{}

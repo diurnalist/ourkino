@@ -62,6 +62,22 @@
             <div class="details-text">
               <h3 class="showtime-title">{{ $details.Metadata.Title }}</h3>
               <div class="showtime-description">{{ $details.Metadata.Overview }}</div>
+              <ul class="showtime-stats">
+                <li class="showtime-stat">
+                  <span class="showtime-stat-label">Release Date</span>
+                  <span class="showtime-stat-value">{{ $details.Metadata.ReleaseDate }}</span>
+                </li>
+                <li class="showtime-stat">
+                  <span class="showtime-stat-label">Runtime</span>
+                  <span class="showtime-stat-value">{{ $details.Metadata.Runtime }} minutes</span>
+                </li>
+                {{- if $details.Metadata.OriginalLanguage }}
+                <li class="showtime-stat">
+                  <span class="showtime-stat-label">Language</span>
+                  <span class="showtime-stat-value">{{ $details.Metadata.OriginalLanguage }}</span>
+                </li>
+                {{- end }}
+              </ul>
             </div>
           {{ else }}
             <div class="details-text">

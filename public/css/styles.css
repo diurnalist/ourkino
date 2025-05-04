@@ -177,16 +177,21 @@ header {
   background: #1f6b8a;
 }
 
-.showtime-description {
-  font-size: 3.6rem;
-  margin: 2.5rem 0 5rem;
-  color: #2e8ab1;
+.details-text {
+  color: #93cce4;
 }
 
-.details-text .showtime-title {
-  margin-top: 2.5rem;
-  font-size: 3.2rem;
-  color: #93cce4;
+.details .showtime-stats {
+  margin-top: 2rem;
+  font-size: 2.4rem;
+}
+
+.details .showtime-stats .showtime-stat {
+  margin-top: 1rem;
+}
+
+.details .showtime-stat-label {
+  color: #2e8ab1;
 }
 
 .details .showtime-image {
@@ -253,7 +258,7 @@ header {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: 2rem;
+  gap: 4rem;
   margin-bottom: 4rem;
 }
 
@@ -269,7 +274,6 @@ header {
   width: 18rem;
   max-width: 100%;
   height: auto;
-  border-radius: 0.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   flex-shrink: 0;
 }
@@ -281,12 +285,16 @@ header {
   justify-content: flex-start;
 }
 
+.details-text .showtime-title {
+  margin-top: 2.5rem;
+}
+
 .details-text .showtime-description {
-  font-size: 1.7rem;
-  color: #2e8ab1;
-  margin: 1.2rem 0 0 0;
+  font-size: 3.6rem;
   font-weight: 400;
   line-height: 1.4;
+  margin: 2.5rem 0 5rem;
+  opacity: 0.75;
 }
 
 @media (max-width: 600px) {
@@ -311,12 +319,12 @@ header {
     width: 100%;
   }
 
-  .details-text .showtime-title {
-    font-size: 2.4rem;
+  .details .showtime-title {
+    font-size: 4.8rem;
   }
 
-  .details-text .showtime-description {
-    font-size: 1.5rem;
+  .details .showtime-description {
+    font-size: 5.2rem;
   }
 }
 
