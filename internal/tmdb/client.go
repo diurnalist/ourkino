@@ -7,7 +7,8 @@ import (
 	"net/http"
 	"net/url"
 	"sort"
-	"time"
+
+	"github.com/hashicorp/go-retryablehttp"
 )
 
 const (
@@ -16,17 +17,16 @@ const (
 
 // TMDBClient implements the TMDB interface
 type TMDBClient struct {
-	client  *http.Client
+	client  *retryablehttp.Client
 	apiKey  string
 	baseURL string
 }
 
 // NewTMDBClient creates a new TMDB client
 func NewTMDBClient(apiKey string) *TMDBClient {
+	client := retryablehttp.NewClient()
 	return &TMDBClient{
-		client: &http.Client{
-			Timeout: 10 * time.Second,
-		},
+		client:  client,
 		apiKey:  apiKey,
 		baseURL: baseURL,
 	}
@@ -78,7 +78,7 @@ func (c *TMDBClient) SearchMovies(ctx context.Context, query string, opts Search
 }
 
 // newRequest creates a new HTTP request with the proper headers
-func (c *TMDBClient) newRequest(ctx context.Context, path string, params url.Values) (*http.Request, error) {
+func (c *TMDBClient) newRequest(ctx context.Context, path string, params url.Values) (*retryablehttp.Request, error) {
 	url := c.baseURL + path
 	if params != nil {
 		url += "?" + params.Encode()
@@ -92,11 +92,16 @@ func (c *TMDBClient) newRequest(ctx context.Context, path string, params url.Val
 	req.Header.Set("authorization", "Bearer "+c.apiKey)
 	req.Header.Set("accept", "application/json")
 
-	return req, nil
+	retryableReq, err := retryablehttp.FromRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return retryableReq, nil
 }
 
 // do performs the HTTP request and decodes the response
-func (c *TMDBClient) do(req *http.Request, v interface{}) error {
+func (c *TMDBClient) do(req *retryablehttp.Request, v interface{}) error {
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return fmt.Errorf("performing request: %w", err)
