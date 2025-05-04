@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html"
 	"net/http"
 	"time"
 
@@ -78,9 +79,12 @@ func (s imdbScraper) Scrape(ch chan<- []model.Showtime, dates []time.Time, tz *t
 					continue
 				}
 
+				// Decode HTML entities in the movie title
+				decodedTitle := html.UnescapeString(event.WorkPresented.Name)
+
 				showtimes = append(showtimes,
 					model.Showtime{
-						Film:      event.WorkPresented.Name,
+						Film:      decodedTitle,
 						When:      time.Date(d.Year(), d.Month(), d.Day(), d.Hour(), d.Minute(), 0, 0, tz),
 						Language:  "",
 						TicketURL: event.WorkPresented.URL,

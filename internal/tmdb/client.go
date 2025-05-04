@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sort"
 	"strings"
 	"time"
 )
@@ -68,6 +69,19 @@ func (c *TMDBClient) SearchMovies(ctx context.Context, query string, opts Search
 	if err := c.do(req, &response); err != nil {
 		return nil, fmt.Errorf("searching movies: %w", err)
 	}
+
+	// Sort results by release date in descending order
+	sort.Slice(response.Results, func(i, j int) bool {
+		// Handle empty release dates by putting them at the end
+		if response.Results[i].ReleaseDate == "" {
+			return false
+		}
+		if response.Results[j].ReleaseDate == "" {
+			return true
+		}
+		// Date formats follow ISO YYYY-MM-DD, so string comparison just works.
+		return response.Results[i].ReleaseDate > response.Results[j].ReleaseDate
+	})
 
 	return response.Results, nil
 }
