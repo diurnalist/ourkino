@@ -100,7 +100,7 @@ func (s KinoheldScraper) Scrape(ch chan<- []model.Showtime, dates []time.Time, t
 		}
 
 		showtimes = append(showtimes, model.Showtime{
-			Film: title, When: showtime, Language: language, DeepLink: deepLink,
+			Film: title, When: showtime, Language: language, TicketURL: deepLink,
 		})
 	}
 

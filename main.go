@@ -11,6 +11,7 @@ import (
 	"github.com/diurnalist/ourkino/internal/config"
 	"github.com/diurnalist/ourkino/internal/renderer"
 	"github.com/diurnalist/ourkino/internal/scraper"
+	"github.com/diurnalist/ourkino/internal/tmdb"
 )
 
 func main() {
@@ -45,11 +46,16 @@ func main() {
 	entries, err := job.Execute(context.Background())
 	check(err)
 
-	// Render the results
+	// Create appropriate renderer
 	var r renderer.Renderer
 	switch *output {
 	case "html":
-		r = renderer.HtmlRenderer{}
+		tmdbAPIKey := os.Getenv("TMDB_API_KEY")
+		if tmdbAPIKey == "" {
+			check(fmt.Errorf("TMDB_API_KEY environment variable is required for HTML output"))
+		}
+		tmdbClient := tmdb.NewTMDBClient(tmdbAPIKey)
+		r = renderer.NewHtmlRenderer(tmdbClient)
 	default:
 		r = renderer.ConsoleRenderer{}
 	}

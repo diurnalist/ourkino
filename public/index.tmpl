@@ -23,7 +23,7 @@
           <div class="showtime-time">{{ .ShowtimeDisplay }}</div>
           <div class="showtime-info">
             <div class="showtime-title">
-              <a {{ if .DeepLink }}href="{{ .DeepLink }}" target="_blank"{{ end }} data-goto-details="{{ .DetailsIndex }}">{{ .Film }}</a>
+              <a data-goto-details="{{ .DetailsIndex }}">{{ .Film }}</a>
               {{- if .Language}}
                 <span class="showtime-language">{{ .Language }}</span>
               {{end -}}
@@ -51,9 +51,23 @@
         <div class="details-controls">
           <button class="close">Close</button>
         </div>
-        {{ if $details.ImageURL }}<img class="showtime-image" src="{{ $details.ImageURL }}" />{{ end }}
-        <h3 class="showtime-title">{{ $details.Film }}</h3>
-        <div class="showtime-description">{{ $details.Description }}</div>
+        {{ if $details.Metadata }}
+          {{ if $details.Metadata.PosterPath }}<img class="showtime-image" src="https://image.tmdb.org/t/p/w500{{ $details.Metadata.PosterPath }}" />{{ end }}
+          <h3 class="showtime-title">{{ $details.Metadata.Title }}</h3>
+          <div class="showtime-description">{{ $details.Metadata.Overview }}</div>
+        {{ else }}
+          <h3 class="showtime-title">{{ $details.Film }}</h3>
+        {{ end }}
+        {{ if .TicketURL }}
+          <a href="{{ .TicketURL }}" target="_blank" class="ticket-button">Get Tickets</a>
+        {{ end }}
+        {{ if .Metadata }}
+          <div class="tmdb-attribution">
+            <a href="https://www.themoviedb.org/" target="_blank" title="Powered by TMDB">
+              <img src="./img/tmdb-logo-short.svg" alt="TMDB" />
+            </a>
+          </div>
+        {{ end }}
       </div>
     </div>
     {{ end }}

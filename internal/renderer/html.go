@@ -1,15 +1,27 @@
 package renderer
 
 import (
+	"context"
 	"os"
 	"strings"
 	"text/template"
 	"time"
 
 	"github.com/diurnalist/ourkino/internal/model"
+	"github.com/diurnalist/ourkino/internal/tmdb"
 )
 
-type HtmlRenderer struct{}
+// HtmlRenderer renders showtimes as an HTML page with movie metadata
+type HtmlRenderer struct {
+	tmdb tmdb.TMDB
+}
+
+// NewHtmlRenderer creates a new HTML renderer with TMDB integration
+func NewHtmlRenderer(tmdbClient tmdb.TMDB) *HtmlRenderer {
+	return &HtmlRenderer{
+		tmdb: tmdbClient,
+	}
+}
 
 type ShowtimeTemplateVars struct {
 	Theatre         string
@@ -19,23 +31,79 @@ type ShowtimeTemplateVars struct {
 	Language        string
 	SearchIndex     string
 	DetailsIndex    string
-	DeepLink        string
+	TicketURL       string
+	TMDBID          string
+}
+
+type MovieMetadata struct {
+	Title       string
+	Overview    string
+	PosterPath  string
+	ReleaseDate string
+}
+
+// MovieKey represents a unique movie by its title and release year
+type MovieKey struct {
+	Title       string
+	ReleaseYear string // Empty string if unknown
 }
 
 type DetailsTemplateVars struct {
-	Film        string
-	Description string
-	ImageURL    string
+	Film      string
+	Metadata  *MovieMetadata
+	TicketURL string
 }
 
 type TemplateVars struct {
 	ByTime          map[time.Time][]ShowtimeTemplateVars
 	Details         map[string]DetailsTemplateVars
+	Movies          map[MovieKey]*MovieMetadata
 	GoogleAnalytics string
 }
 
-func (r HtmlRenderer) Render(entries []model.ShowtimeEntry) error {
-	var err error
+// preprocess fetches movie metadata for all unique movies
+func (r *HtmlRenderer) preprocess(ctx context.Context, entries []model.ShowtimeEntry) (map[MovieKey]*MovieMetadata, error) {
+	// First, build a map of unique movies
+	movies := make(map[MovieKey]*MovieMetadata)
+	for _, entry := range entries {
+		// TODO: In the future, we could extract release year from the movie title or other sources
+		key := MovieKey{
+			Title:       entry.Film,
+			ReleaseYear: "", // For now, we don't have release year information
+		}
+		movies[key] = nil // Initialize with nil metadata
+	}
+
+	// Now fetch metadata for each unique movie
+	for key := range movies {
+		// TODO: In the future, we could use the release year to improve search accuracy
+		results, err := r.tmdb.SearchMovies(ctx, key.Title, tmdb.SearchOptions{})
+		if err != nil {
+			return nil, err
+		}
+
+		// For now, just take the first result if we have one
+		if len(results) > 0 {
+			movie := results[0]
+			movies[key] = &MovieMetadata{
+				Title:       movie.Title,
+				Overview:    movie.Overview,
+				PosterPath:  movie.PosterPath,
+				ReleaseDate: movie.ReleaseDate,
+			}
+		}
+	}
+
+	return movies, nil
+}
+
+func (r *HtmlRenderer) Render(entries []model.ShowtimeEntry) error {
+	// Preprocess to fetch movie metadata
+	movies, err := r.preprocess(context.Background(), entries)
+	if err != nil {
+		return err
+	}
+
 	t, err := template.ParseFiles("public/index.tmpl")
 	if err != nil {
 		return err
@@ -45,7 +113,6 @@ func (r HtmlRenderer) Render(entries []model.ShowtimeEntry) error {
 	bucketTime := time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC)
 
 	details := make(map[string]DetailsTemplateVars, 1)
-	emptyDetails := model.ShowtimeDetails{}
 
 	for _, entry := range entries {
 		showtime := entry.Showtime.When
@@ -59,19 +126,31 @@ func (r HtmlRenderer) Render(entries []model.ShowtimeEntry) error {
 		filmKey := strings.ToLower(strings.Join(strings.Fields(entry.Film), " "))
 		theatreKey := strings.ToLower(strings.Join(strings.Fields(entry.Theatre), " "))
 		searchIndex := filmKey + " " + theatreKey
+
+		// Create the movie key for this entry
+		movieKey := MovieKey{
+			Title:       entry.Film,
+			ReleaseYear: "", // For now, we don't have release year information
+		}
+
+		// Get the TMDB ID if we have metadata
+		var tmdbID string
+		if metadata := movies[movieKey]; metadata != nil {
+			// TODO: In the future, we could store the TMDB ID in the metadata
+			// For now, we'll just use an empty string
+		}
+
 		buckets[bucketTime] = append(buckets[bucketTime], ShowtimeTemplateVars{
 			Theatre: entry.Theatre, Film: entry.Film, ShowtimeISO: showtimeIso,
 			ShowtimeDisplay: showtimeDisplay, Language: entry.Language,
 			SearchIndex: searchIndex, DetailsIndex: filmKey,
-			DeepLink: entry.DeepLink,
+			TicketURL: entry.Showtime.TicketURL, TMDBID: tmdbID,
 		})
 
-		if entry.Details != emptyDetails {
-			details[filmKey] = DetailsTemplateVars{
-				Film:        entry.Film,
-				Description: entry.Details.Description,
-				ImageURL:    entry.Details.ImageURL,
-			}
+		details[filmKey] = DetailsTemplateVars{
+			Film:      entry.Film,
+			Metadata:  movies[movieKey],
+			TicketURL: entry.Showtime.TicketURL,
 		}
 	}
 
@@ -86,7 +165,12 @@ func (r HtmlRenderer) Render(entries []model.ShowtimeEntry) error {
 		return err
 	}
 
-	err = t.Execute(outFile, TemplateVars{ByTime: buckets, Details: details, GoogleAnalytics: ""})
+	err = t.Execute(outFile, TemplateVars{
+		ByTime:          buckets,
+		Details:         details,
+		Movies:          movies,
+		GoogleAnalytics: "",
+	})
 	if err != nil {
 		return err
 	}

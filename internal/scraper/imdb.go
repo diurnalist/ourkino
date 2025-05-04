@@ -80,13 +80,10 @@ func (s imdbScraper) Scrape(ch chan<- []model.Showtime, dates []time.Time, tz *t
 
 				showtimes = append(showtimes,
 					model.Showtime{
-						Film:     event.WorkPresented.Name,
-						When:     time.Date(d.Year(), d.Month(), d.Day(), d.Hour(), d.Minute(), 0, 0, tz),
-						Language: "",
-						DeepLink: event.WorkPresented.URL,
-						Details: model.ShowtimeDetails{
-							ImageURL: event.WorkPresented.Image,
-						},
+						Film:      event.WorkPresented.Name,
+						When:      time.Date(d.Year(), d.Month(), d.Day(), d.Hour(), d.Minute(), 0, 0, tz),
+						Language:  "",
+						TicketURL: event.WorkPresented.URL,
 					})
 			}
 		})

@@ -4,16 +4,11 @@ import (
 	"time"
 )
 
-type ShowtimeDetails struct {
-	Description string
-	ImageURL    string
-}
 type Showtime struct {
-	Film     string
-	When     time.Time
-	Language string
-	DeepLink string
-	Details  ShowtimeDetails
+	Film      string
+	When      time.Time
+	Language  string
+	TicketURL string
 }
 
 type ShowtimeEntry struct {

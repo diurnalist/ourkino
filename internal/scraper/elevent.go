@@ -78,14 +78,10 @@ func (s eleventScraper) Scrape(ch chan<- []model.Showtime, dates []time.Time, tz
 					}
 
 					showtimes = append(showtimes, model.Showtime{
-						Film:     event.EventName,
-						When:     showtime,
-						Language: "",
-						DeepLink: "",
-						Details: model.ShowtimeDetails{
-							Description: event.Synopsis,
-							ImageURL:    event.EventImageURL,
-						},
+						Film:      event.EventName,
+						When:      showtime,
+						Language:  "",
+						TicketURL: "",
 					})
 				}
 			}

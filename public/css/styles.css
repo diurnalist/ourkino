@@ -11,7 +11,7 @@ body {
   box-sizing: border-box;
 }
 
-body   {
+body {
   background: #343d46;
 }
 
@@ -25,7 +25,8 @@ a {
   color: inherit;
 }
 
-a[data-goto-page], a[data-goto-details] {
+a[data-goto-page],
+a[data-goto-details] {
   cursor: pointer;
 }
 
@@ -39,7 +40,7 @@ header {
   padding: 0 5rem;
 }
 
-.filter > input {
+.filter>input {
   flex: 1;
   font-size: 4.8rem;
   font-family: inherit;
@@ -81,7 +82,8 @@ header {
   padding: 1.5rem 0 0 5rem;
 }
 
-.showtime-title, .empty {
+.showtime-title,
+.empty {
   font-size: 4.8rem;
   color: #93cce4;
   line-height: 1.1em;
@@ -125,7 +127,9 @@ header {
 .details-controls {
   padding: 2rem 0;
   text-align: right;
-} .details-controls button {
+}
+
+.details-controls button {
   /* Disable for now; it is only a visual cue and may not be needed at all */
   display: none;
 }
@@ -143,4 +147,35 @@ header {
 .details .showtime-image {
   width: 100%;
   object-fit: scale-down;
+}
+
+.ticket-button {
+  display: inline-block;
+  background: #2e8ab1;
+  color: #d3e3ea;
+  font-size: 3.6rem;
+  padding: 2rem 4rem;
+  border-radius: 0.5rem;
+  margin: 2rem 0;
+  text-align: center;
+  transition: background-color 0.2s;
+}
+
+.ticket-button:hover {
+  background: #1f6b8a;
+}
+
+.tmdb-attribution {
+  margin-top: 1rem;
+  text-align: right;
+}
+
+.tmdb-attribution img {
+  height: 20px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.tmdb-attribution img:hover {
+  opacity: 1;
 }
