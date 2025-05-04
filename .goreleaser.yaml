@@ -13,5 +13,6 @@ archives:
   - files:
       - example/*
       - public/css/*
+      - public/img/*
       - public/js/*
       - public/index.tmpl
