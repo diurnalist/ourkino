@@ -1,6 +1,6 @@
 module github.com/diurnalist/ourkino
 
-go 1.24
+go 1.24.0
 
 require (
 	github.com/andybalholm/cascadia v1.3.3 // indirect
@@ -15,5 +15,5 @@ require (
 	github.com/PuerkitoBio/goquery v1.10.3
 	github.com/hashicorp/go-retryablehttp v0.7.7
 	github.com/jedib0t/go-pretty/v6 v6.3.8
-	golang.org/x/sync v0.13.0
+	golang.org/x/sync v0.18.0
 )
